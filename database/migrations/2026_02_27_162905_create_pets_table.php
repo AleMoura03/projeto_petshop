@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDeletr('cascade');
             $table->string('nome');
             $table->string('raca')->nullable();
-            $table->integer('idade')-nullable();
+            $table->integer('idade')->nullable();
             $table->timestamps();
         });
     }
