@@ -1,7 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AgendamentoController;
 
-Route::get('/', function () {
-    return view('welcome');
+Route::middleware('auth')->group(function (){
+    Route::get('/agendar', [AgendamentoController::class, 'create'])->name('agendamento.create');
+    Route::post('/agendar', [AgendamentoController::class, 'store'])->name('agendamento.store');
 });
