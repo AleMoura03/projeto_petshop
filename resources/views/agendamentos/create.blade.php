@@ -24,7 +24,7 @@
                 <label>Seviço:</label>
                 <select name="servico_id" required>
                     @foreach($servicos as $servico)
-                        <option value="{{ $servico_id }}">
+                        <option value="{{ $servico->id }}">
                             {{ $servico->nome }} - R$ {{ $servico->preco }}
                         </option>
                     @endforeach
