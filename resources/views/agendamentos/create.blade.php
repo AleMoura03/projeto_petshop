@@ -8,7 +8,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ 'agendamentos.store' }}">
+        <form method="POST" action="{{ route ('agendamentos.store') }}">
             @csrf
 
             <div class="mb-3">

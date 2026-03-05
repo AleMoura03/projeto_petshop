@@ -2,21 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Agendamento;
+use App\Models\Pet;
+use App\Models\Servico;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
-class AgendamentoContoller extends Controller
+class AgendamentoController extends Controller
 {
-    use App\Models\Agendamento;
-    use App\Models\Pet;
-    use App\Models\Servico;
-    use Illuminate\Http\Request;
-    use Illuminate\Suport\Facades\Auth;
-
-    public function create(){
+    protected $fillable = [
+        'user_id',
+        'pet_id',
+        'servico_id',
+        'data',
+        'hora'
+    ];
+     public function create(){
         $pets = Pet::where('user_id', Auth::id())->get();
         $servicos = Servico::all();
 
-        return view('agendamento.create', compact('pets', 'servicos'));
+        return view('agendamentos.create', compact('pets', 'servicos'));
     }
 
     public function store (Request $request){
@@ -35,7 +40,6 @@ class AgendamentoContoller extends Controller
             'hora' => $request->hora
         ]);
 
-        return redirect()->route('agendamento.create')
-                         ->('sucess', 'Agendamento realizado com sucesso!');
+        return redirect()->route('agendar')->with('success', 'Agendamento realizado com sucesso!');
     }
 }

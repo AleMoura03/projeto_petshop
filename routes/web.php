@@ -1,15 +1,18 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AgendamentoController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
+// 
+Route::middleware(['auth'])->group(function (){
 
-Route::get('/agendar', function () {
-    return view('agendamentos.create');
-})->middleware(['auth'])->name('agendar');
+Route::get('/agendar', [AgendamentoController::class, 'create'])->middleware([auth])->name('agendar');
+
+Route::post('/agendar', [AgendamentoController::class, 'store'])->name('agendar.store');
+});
 
 Route::get('/dashboard', function () {
     return view('dashboard');
