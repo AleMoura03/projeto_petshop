@@ -1,10 +1,10 @@
 <x-app-layout>
-    <div class="max-w-4xl mc-auto p-6">
+    <div class="max-w-4xl mx-auto p-6">
         <h2 class="text-xl mb-4">Novo Agendamento</h2>
 
-        @if(session('sucess'))
+        @if(session('success'))
             <div class="bg-green-200 p-2 mb-3">
-                {{ session('sucess') }}
+                {{ session('success') }}
             </div>
         @endif
 
