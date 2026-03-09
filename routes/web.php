@@ -20,6 +20,14 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/agendar', [AgendamentoController::class, 'store'])
         ->name('agendar.store');
+
+    Route::get('/admin/dashboard', function (){
+        return view('admin.dashboard');
+    })->name('admin.dashboard');
+
+    Route::get('/client/dashboard', function () {
+        return view('client.dashboard');
+    })->name('client.dashboard');
 });
 
 
