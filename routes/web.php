@@ -3,6 +3,11 @@
 use App\Http\Controllers\AgendamentoController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PetController;
+use App\Http\Controllers\AppointmentController;
+
+Route::middleware(['auth'])->group(function () {
+    Route::resource('appointments', AppointmentController::class);
+});
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('pets', PetController::class);
