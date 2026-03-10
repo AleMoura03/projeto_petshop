@@ -2,6 +2,11 @@
 
 use App\Http\Controllers\AgendamentoController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PetController;
+
+Route::middleware(['auth'])->group(function () {
+    Route::resource('pets', PetController::class);
+});
 
 Route::get('/', function () {
     return view('welcome');

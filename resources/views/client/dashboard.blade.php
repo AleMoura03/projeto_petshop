@@ -6,6 +6,14 @@
     </li>
 
     <li>
-        <a href
+        <a href="{{ route('appointments.create')}}">Agendar Serviço</a>
+    </li>
+
+    <li>
+        <a href="{{ route('pets.index') }}">Meus Pets</a>
+    </li>
+
+    <li>
+        <a href="{{ route('appointments.index') }}">Meus Agendamentos</a>
     </li>
 </ul>
