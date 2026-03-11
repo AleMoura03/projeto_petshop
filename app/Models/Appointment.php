@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+
 class Appointment extends Model
 {
     protected $fillable = [
@@ -14,4 +15,9 @@ class Appointment extends Model
         'time',
         'status'
     ];
+
+    public function pet()
+    {
+        return $this->belongsTo(Pet::class);
+    }
 }

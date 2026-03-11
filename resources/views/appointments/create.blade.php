@@ -1,3 +1,9 @@
+@if(session('error'))
+    <p style="color:red">
+        {{ session('error') }}
+    </p>
+@endif
+
 <h1>Agendar Serviço</h1>
 
 <form method="POST" action="{{ route('appointments.store') }}">

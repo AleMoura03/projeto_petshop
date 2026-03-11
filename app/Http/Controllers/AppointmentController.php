@@ -13,7 +13,11 @@ class AppointmentController extends Controller
      */
     public function index()
     {
-        //
+        $appointments = Appointment::where('user_id', auth()->id())
+            ->with('pet')
+            ->get();
+
+        return view('appointments.index', compact('appointments'));
     }
 
     /**
@@ -21,7 +25,7 @@ class AppointmentController extends Controller
      */
     public function create()
     {
-        $pets = Pet::where('use_id', qautj()->id())-get();
+        $pets = Pet::where('user_id', auth()->id())->get();
 
         return view('appointments.create', compact('pets'));
     }
@@ -31,10 +35,23 @@ class AppointmentController extends Controller
      */
     public function store(Request $request)
     {
+        $exists = Appointment::where('date', $request->date)
+            ->where('time', $request->time)->exists();
+
+        if ($exists) {
+            return back()->with('error', 'Horário já está ocupado.');
+        }
+
         Appointment::create([
             'user_id' => auth()->id(),
-            'pet_id' => $request->pet_id
-        ])
+            'pet_id' => $request->pet_id,
+            'service' => $request->service,
+            'date' => $request->date,
+            'time' => $request->time,
+            'status' => 'pendente'
+        ]);
+
+        return redirect()->route('client.index');
     }
 
     /**
