@@ -51,7 +51,8 @@ class AppointmentController extends Controller
             'status' => 'pendente'
         ]);
 
-        return redirect()->route('client.index');
+        return redirect()->route('appointments.create')
+            ->with('success', 'Agendamento realizado com sucesso!');
     }
 
     /**

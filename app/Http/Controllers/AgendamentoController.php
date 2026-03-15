@@ -10,15 +10,8 @@ use Illuminate\Support\Facades\Auth;
 
 class AgendamentoController extends Controller
 {
-    protected $fillable = [
-        'user_id',
-        'pet_id',
-        'servico_id',
-        'data',
-        'hora'
-    ];
      public function create(){
-        $pets = Pet::where('user_id', Auth::id())->get();
+        $pets = Auth::user()-pets;
         $servicos = Servico::all();
 
         return view('agendamentos.create', compact('pets', 'servicos'));

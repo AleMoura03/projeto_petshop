@@ -8,20 +8,25 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route ('agendar.store') }}">
+        <form method="POST" action="{{ route('agendar.store') }}">
             @csrf
 
             <div class="mb-3">
-                <label>Pet:</label>
-                <select name="pet_id" required>
-                    @foreach($pets as $pet)
-                        <option value="{{ $pet->id }}">{{ $pet->nome }}</option>
-                    @endforeach
+                <label>Escolha o pet</label>
+
+                <select name="pet_id">
+
+                @foreach($pets as $pet)
+                    <option value="{{ $pet->id }}">
+                        {{ $pet->name }}
+                    </option>
+                @endforeach
+
                 </select>
             </div>
 
             <div class="mb-3">
-                <label>Seviço:</label>
+                <label>Serviço:</label>
                 <select name="servico_id" required>
                     @foreach($servicos as $servico)
                         <option value="{{ $servico->id }}">
@@ -44,7 +49,7 @@
             <button type="submit">
                 Agendar
             </button>
-            
+
         </form>
 
     </div>

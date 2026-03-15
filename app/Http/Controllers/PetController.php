@@ -27,7 +27,7 @@ class PetController extends Controller
             'age' => $request->age
         ]);
 
-        return redirect()->route('pets.index');
+        return redirect()->route('agendar');
     }
 
     public function show(Pet $pet)
