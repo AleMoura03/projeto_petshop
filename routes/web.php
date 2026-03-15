@@ -4,6 +4,8 @@ use App\Http\Controllers\AgendamentoController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PetController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AdminController;
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('appointments', AppointmentController::class);
@@ -45,6 +47,11 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::middleware(['auth','admin'])->prefix('admin')->group(function () {
+
+    Route::get('/dashboard', [AdminController::class,'dashboard'])->name('admin.dashboard');
+
+});
 
 Route::middleware(['auth'])->group(function () {
 
@@ -55,6 +62,8 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
 });
+
+
 
 
 require __DIR__ . '/auth.php';

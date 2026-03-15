@@ -6,14 +6,18 @@
     <label>Nome do Pet</label>
     <input type="text" name="name" required>
 
+    <br><br>
+
     <label>Espécie</label>
     <input type="text" name="species">
+
+    <br><br>
 
     <label>Raça</label>
     <input type="text" name="breed">
 
-    <label>Idade</label>
-    <input type="number" name="age">
+    <br><br>
 
-    <button type="submit">Salvar</button>
+    <button type="submit">Salvar Pet</button>
+
 </form>
