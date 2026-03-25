@@ -22,8 +22,11 @@ Route::get('/', function () {
 Route::middleware(['auth'])->group(function () {
 
     Route::get('/home', function () {
-        return view('home');
-    })->name('home');
+        return redirect()->route('client.dashboard');
+    });
+
+    Route::get('/agendamentos', [AgendamentoController::class, 'index'])
+        ->name('agendamentos.index');
 
 
     Route::get('/agendar', [AgendamentoController::class, 'create'])

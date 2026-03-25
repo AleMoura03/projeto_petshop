@@ -17,6 +17,15 @@ class AgendamentoController extends Controller
         return view('agendamentos.create', compact('pets', 'servicos'));
     }
 
+    public function index()
+    {
+        $agendamentos = Agendamento::where('user_id', Auth::id())
+            ->with('pet', 'servico')
+            ->get();
+
+        return view('agendamentos.index', compact('agendamentos'));
+    }
+
     public function store (Request $request){
         $request->validate([
             'pet_id' => 'required',

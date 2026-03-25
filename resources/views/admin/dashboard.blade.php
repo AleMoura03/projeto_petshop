@@ -1,3 +1,8 @@
+<form method="POST" action="{{ route('logout') }}">
+    @csrf
+    <button type="submit">Logout</button>
+</form>
+
 <h1>Painel Administrativo</h1>
 
 <h2>Agendamentos</h2>

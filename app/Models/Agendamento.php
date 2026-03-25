@@ -13,14 +13,18 @@ class Agendamento extends Model
         'data',
         'hora'
     ];
-    public function user(){
-        return $this->belongsTo(User::class);
-    }
-
-    public function pet(){
+    public function pet()
+    {
         return $this->belongsTo(Pet::class);
     }
-    public function servico(){
+
+    public function servico()
+    {
         return $this->belongsTo(Servico::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }
