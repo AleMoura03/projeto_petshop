@@ -16,8 +16,8 @@
     @foreach($appointments as $appointment)
 
         <tr>
-            <td>{{ $appointment->user->name }}</td>
-            <td>{{ $appointment->pet->name }}</td>
+            <td>{{ $appointment->user->name ?? 'Sem usuário' }}</td>
+            <td>{{ $appointment->pet->name ?? 'Sem pet' }}</td>
             <td>{{ $appointment->service }}</td>
             <td>{{ $appointment->date }}</td>
             <td>{{ $appointment->time }}</td>

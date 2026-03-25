@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 class AgendamentoController extends Controller
 {
      public function create(){
-        $pets = Auth::user()-pets;
+        $pets = Auth::user()->pets;
         $servicos = Servico::all();
 
         return view('agendamentos.create', compact('pets', 'servicos'));

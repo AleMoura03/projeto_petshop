@@ -8,7 +8,6 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
 
 Route::middleware(['auth'])->group(function () {
-    Route::resource('appointments', AppointmentController::class);
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -44,8 +43,8 @@ Route::middleware(['auth'])->group(function () {
 
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+    return redirect()->route('client.dashboard');
+});
 
 Route::middleware(['auth','admin'])->prefix('admin')->group(function () {
 
