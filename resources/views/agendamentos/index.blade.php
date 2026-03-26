@@ -1,5 +1,7 @@
 <x-app-layout>
     <div class="max-w-4xl mx-auto p-6">
+
+
         <h2 class="text-xl mb-4">Meus Agendamentos</h2>
 
         <table border="1" cellpadding="10">
@@ -19,6 +21,17 @@
                     <td>{{ $agendamento->hora }}</td>
                     <td>{{ $agendamento->status }}</td>
                 </tr>
+
+                <td>
+                    <a href="{{ route('agendamentos.edit', $agendamento->id) }}">
+                        Editar
+                    </a>
+                    <form action="{{ route('agendamentos.destroy', $agendamento->id) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit">Cancelar</button>
+                    </form>
+                </td>
             @endforeach
 
         </table>

@@ -1,25 +1,25 @@
-<h1>Meus Pets</h1>
+<x-app-layout>
+    <div class="max-w-4xl mx-auto p-6">
 
-<a href="/pets/create">Cadastrar novo pet</a>
+        <h2 class="text-xl mb-4">Meus Pets</h2>
 
-<table border="1">
+        <ul>
+            @foreach($pets as $pet)
+                <li>
+                    {{ $pet->name }} - {{ $pet->species }} - {{ $pet->breed }}
 
-    <tr>
-        <th>Nome</th>
-        <th>Espécie</th>
-        <th>Raça</th>
-        <th>Idade</th>
-    </tr>
 
-    @foreach($pets as $pet)
+                    <a href="{{ route('pets.edit', $pet->id) }}">
+                        Editar
+                    </a>
 
-        <tr>
-            <td>{{ $pet->name }}</td>
-            <td>{{ $pet->species }}</td>
-            <td>{{ $pet->breed }}</td>
-            <td>{{ $pet->age }}</td>
-        </tr>
-
-    @endforeach
-
-</table>
+                    <form action="{{ route('pets.destroy', $pet->id) }}" method="POST" style="display:inline;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit">Excluir</button>
+                    </form>
+                </li>
+            @endforeach
+        </ul>
+    </div>
+</x-app-layout>

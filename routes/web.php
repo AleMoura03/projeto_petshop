@@ -28,12 +28,20 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/agendamentos', [AgendamentoController::class, 'index'])
         ->name('agendamentos.index');
 
+    Route::get('/agendamentos/{agendamento}/edit', [AgendamentoController::class, 'edit'])
+        ->name('agendamentos.edit');
+
+    Route::put('/agendamentos/{agendamento}', [AgendamentoController::class, 'update'])
+        ->name('agendamentos.update');
 
     Route::get('/agendar', [AgendamentoController::class, 'create'])
         ->name('agendar');
 
     Route::post('/agendar', [AgendamentoController::class, 'store'])
         ->name('agendar.store');
+
+    Route::delete('/agendamentos/{agendamento}', [AgendamentoController::class, 'destroy'])
+        ->name('agendamentos.destroy');
 
     Route::get('/admin/dashboard', function (){
         return view('admin.dashboard');
