@@ -16,7 +16,20 @@ class PetController extends Controller
 
     public function create()
     {
-        return view('pets.create');
+        $racas = [
+            'SRD - Sem Raça Definida',
+            'Shih Tzu',
+            'Labrador',
+            'Golden Retriever',
+            'Bulldog',
+            'Poodle',
+            'Pastor Alemão',
+            'Rottweiler',
+            'Yorkshire',
+            'Pinscher'
+        ];
+
+        return view('pets.create', compact('racas'));
     }
 
     public function store(Request $request)
@@ -26,20 +39,36 @@ class PetController extends Controller
             'name' => $request->name,
             'species' => $request->species,
             'breed' => $request->breed,
-            'age' => $request->age
+            'porte' => $request->porte
         ]);
 
         return redirect()->route('pets.index')
-            ->with('success', 'Pet cadastrado com sucesso!');    }
+            ->with('success', 'Pet cadastrado com sucesso!');
+    }
 
     public function show(Pet $pet)
     {
         //
     }
 
-    public function edit(Pet $pet)
+    public function edit($id)
     {
-        return view('pets.edit', compact('pet'));
+        $pet = Pet::findOrFail($id);
+
+        $racas = [
+            'SRD - Sem Raça Definida',
+            'Shih Tzu',
+            'Labrador',
+            'Golden Retriever',
+            'Bulldog',
+            'Poodle',
+            'Pastor Alemão',
+            'Rottweiler',
+            'Yorkshire',
+            'Pinscher'
+        ];
+
+        return view('pets.edit', compact('pet', 'racas'));
     }
 
     public function update(Request $request, Pet $pet)
@@ -48,7 +77,7 @@ class PetController extends Controller
             'name' => $request->name,
             'species' => $request->species,
             'breed' => $request->breed,
-            'age' => $request->age
+            'porte' => $request->porte
         ]);
 
         return redirect()->route('pets.index');

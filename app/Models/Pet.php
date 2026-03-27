@@ -11,7 +11,8 @@ class Pet extends Model
         'name',
         'species',
         'breed',
-        'age'
+        'age',
+        'porte'
     ];
 
     public function user()

@@ -29,19 +29,26 @@ class AgendamentoController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'pet_id' => 'required',
-            'servico_id' => 'required',
-            'data' => 'required|date',
-            'hora' => 'required'
-        ]);
+        $pet = Pet::find($request->pet_id);
+        $servico = Servico::find($request->servico_id);
+
+        // lógica de preço
+        $preco = match ($pet->porte) {
+            'mini' => $servico->preco_mini,
+            'pequeno' => $servico->preco_pequeno,
+            'medio' => $servico->preco_medio,
+            'grande' => $servico->preco_grande,
+            'gigante' => $servico->preco_gigante,
+        };
 
         Agendamento::create([
             'user_id' => Auth::id(),
             'pet_id' => $request->pet_id,
             'servico_id' => $request->servico_id,
             'data' => $request->data,
-            'hora' => $request->hora
+            'hora' => $request->hora,
+            'preco' => $preco,
+            'status' => 'pendente'
         ]);
 
         return redirect()->route('agendar')->with('success', 'Agendamento realizado com sucesso!');
