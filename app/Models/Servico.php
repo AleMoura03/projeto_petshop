@@ -8,8 +8,11 @@ class Servico extends Model
 {
     protected $fillable = [
         'nome',
-        'preco',
-        'duracao'
+        'preco_mini',
+        'preco_pequeno',
+        'preco_medio',
+        'preco_grande',
+        'preco_gigante',
     ];
 
     public function agendamentos()

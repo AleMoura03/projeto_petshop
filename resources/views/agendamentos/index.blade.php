@@ -15,7 +15,7 @@
 
             @foreach($agendamentos as $agendamento)
                 <tr>
-                    <td>{{ $agendamento->pet->name }}</td>
+                    <td>{{ $agendamento->pet->name ?? 'Pet removido' }}</td>
                     <td>{{ $agendamento->servico->nome }}</td>
                     <td>{{ $agendamento->data }}</td>
                     <td>{{ $agendamento->hora }}</td>
