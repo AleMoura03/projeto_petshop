@@ -9,7 +9,8 @@ $racas = [
     'Pastor Alemão',
     'Rottweiler',
     'Pinscher',
-    'Yorkshire'
+    'Yorkshire',
+    'PitBull'
 ];
 @endphp
 

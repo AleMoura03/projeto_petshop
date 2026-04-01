@@ -32,13 +32,14 @@ class AgendamentoController extends Controller
         $pet = Pet::find($request->pet_id);
         $servico = Servico::find($request->servico_id);
 
-        // lógica de preço
+
         $preco = match ($pet->porte) {
             'mini' => $servico->preco_mini,
             'pequeno' => $servico->preco_pequeno,
             'medio' => $servico->preco_medio,
             'grande' => $servico->preco_grande,
             'gigante' => $servico->preco_gigante,
+            default => 0
         };
 
         Agendamento::create([

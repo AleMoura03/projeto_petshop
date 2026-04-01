@@ -1,3 +1,50 @@
+<script>
+    const servicos = @json($servicos);
+    const pets = @json($pets);
+
+    const selectPet = document.getElementById('pet');
+    const selectServico = document.getElementById('servico');
+    const precoServico = document.getElementById('precoServico');
+
+    function atualizarPreco() {
+        const petId = selectPet.value;
+        const servicoId = selectServico.value;
+
+        const pet = pets.find(p => p.id == petId);
+        const servico = servicos.find(s => s.id == servicoId);
+
+        if (!pet || !servico) return;
+
+        let preco = 0;
+
+        switch (pet.porte) {
+            case 'mini':
+                preco = servico.preco_mini;
+                break;
+            case 'pequeno':
+                preco = servico.preco_pequeno;
+                break;
+            case 'medio':
+                preco = servico.preco_medio;
+                break;
+            case 'grande':
+                preco = servico.preco_grande;
+                break;
+            case 'gigante':
+                preco = servico.preco_gigante;
+                break;
+        }
+
+        precoServico.innerHTML = "Preço: R$ " + parseFloat(preco).toFixed(2);
+    }
+
+    selectPet.addEventListener('change', atualizarPreco);
+    selectServico.addEventListener('change', atualizarPreco);
+
+    // roda ao carregar
+    atualizarPreco();
+</script>
+
 <x-app-layout>
 <div class="max-w-4xl mx-auto p-6">
 
@@ -8,7 +55,7 @@
         @method('PUT')
 
         <label>Pet:</label>
-        <select name="pet_id">
+        <select name="pet_id" id="pet">
             @foreach($pets as $pet)
                 <option value="{{ $pet->id }}" 
                     {{ $pet->id == $agendamento->pet_id ? 'selected' : '' }}>
@@ -20,7 +67,8 @@
         <br><br>
 
         <label>Serviço:</label>
-        <select name="servico_id">
+        <select name="servico_id" id="servico">
+            <p id="precoServico" style="front-weigth: bold;"></p>
             @foreach($servicos as $servico)
                 <option value="{{ $servico->id }}"
                     {{ $servico->id == $agendamento->servico_id ? 'selected' : '' }}>

@@ -42,6 +42,13 @@ $racas = [
                 <option {{ $pet->breed == 'Labrador' ? 'selected' : '' }}>Labrador</option>
                 <option {{ $pet->breed == 'Golden Retriever' ? 'selected' : '' }}>Golden Retriever</option>
                 <option {{ $pet->breed == 'Bulldog' ? 'selected' : '' }}>Bulldog</option>
+                <option {{ $pet->breed == 'Pastor Alemao' ? 'selected' : '' }}>Pastor Alemão</option>
+                <option {{ $pet->breed == 'Poodle' ? 'selected' : '' }}>Poodle</option>
+                <option {{ $pet->breed == 'Rottweiler' ? 'selected' : '' }}>Rottweiler</option>
+                <option {{ $pet->breed == 'Pinscher' ? 'selected' : '' }}>Pinscher</option>
+                <option {{ $pet->breed == 'Yorkshire' ? 'selected' : '' }}>Yorkshire</option>
+                <option {{ $pet->breed == 'PitBull' ? 'selected' : '' }}>PitBull</option>
+
             </select>
 
             <br><br>

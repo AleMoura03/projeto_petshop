@@ -20,7 +20,9 @@ class Agendamento extends Model
 
     public function servico()
     {
-        return $this->belongsTo(Servico::class);
+        return $this->belongsTo(Servico::class)->withDefault([
+            'nome' => 'Serviço removido'
+        ]);
     }
 
     public function user()
