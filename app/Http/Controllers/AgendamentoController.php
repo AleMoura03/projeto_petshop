@@ -68,12 +68,28 @@ class AgendamentoController extends Controller
     {
         $agendamento = Agendamento::findOrFail($id);
 
-        $agendamento->update([
-            'pet_id' => $request->pet_id,
-            'servico_id' => $request->servico_id,
-            'data' => $request->data,
-            'hora' => $request->hora
-        ]);
+        $pet = Pet::findOrFail($request->pet_id);
+        $servico = Servico::findOrFail($request->servico_id);
+
+        $porte = strtolower(trim($pet->porte));
+
+        $preco = match ($porte) {
+            'mini' => $servico->preco_mini,
+            'pequeno' => $servico->preco_pequeno,
+            'medio' => $servico->preco_medio,
+            'grande' => $servico->preco_grande,
+            'gigante' => $servico->preco_gigante,
+            default => 0
+        };
+
+
+        $agendamento->pet_id = $request->pet_id;
+        $agendamento->servico_id = $request->servico_id;
+        $agendamento->data = $request->data;
+        $agendamento->hora = $request->hora;
+        $agendamento->preco = $preco;
+
+        $agendamento->save();
 
         return redirect()->route('agendamentos.index');
     }
