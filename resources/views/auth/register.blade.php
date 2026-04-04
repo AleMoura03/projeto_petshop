@@ -1,6 +1,18 @@
 <x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
+    <form method="POST" action="{{ route('register') }}" x-data="{ roleTab: 'cliente' }">
         @csrf
+
+        <!-- Tabs Role Selector -->
+        <div class="flex bg-slate-100 p-1 rounded-xl mb-6">
+            <button type="button" @click="roleTab = 'cliente'" :class="{'bg-white shadow-sm text-orange-500 font-bold': roleTab === 'cliente', 'text-slate-500 hover:text-slate-700': roleTab !== 'cliente'}" class="flex-1 py-3 rounded-lg transition-all font-poppins text-sm">🏡 Sou Cliente</button>
+            <button type="button" @click="roleTab = 'admin'" :class="{'bg-white shadow-sm text-sky-500 font-bold': roleTab === 'admin', 'text-slate-500 hover:text-slate-700': roleTab !== 'admin'}" class="flex-1 py-3 rounded-lg transition-all font-poppins text-sm">💼 AUdministrador</button>
+        </div>
+        <input type="hidden" name="role" :value="roleTab">
+        
+        <div x-show="roleTab === 'admin'" x-transition class="mb-6 p-4 bg-sky-50 border border-sky-100 rounded-xl text-sky-800 text-sm">
+            <span class="font-bold flex items-center gap-2">⚠️ Atenção:</span>
+            O perfil de AUdministrador passará por aprovação de outro administrador antes de ser liberado para login.
+        </div>
 
         <!-- Name -->
         <div>
@@ -39,13 +51,13 @@
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
+        <div class="flex flex-col sm:flex-row items-center justify-between mt-8 gap-4">
+            <a class="underline text-sm text-slate-600 hover:text-orange-500 transition-colors" href="{{ route('login') }}">
+                Já tem uma conta? Entrar
             </a>
 
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
+            <x-primary-button class="w-full sm:w-auto px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl shadow-md transition-all text-base font-poppins font-bold">
+                Criar Conta 🚀
             </x-primary-button>
         </div>
     </form>

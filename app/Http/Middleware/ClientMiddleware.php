@@ -6,17 +6,17 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class AdminMiddleware
+class ClientMiddleware
 {
     /**
      * Handle an incoming request.
      *
      * @param  Closure(Request): (Response)  $next
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->user()->role !== 'admin') {
-            return redirect('/dashboard')->with('error', 'Acesso negado. Esta área é restrita para AUdministradores.');
+        if (auth()->user()->role === 'admin') {
+            return redirect()->route('admin.dashboard');
         }
 
         return $next($request);

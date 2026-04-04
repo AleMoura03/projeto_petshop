@@ -55,6 +55,10 @@ class PetController extends Controller
     {
         $pet = Pet::findOrFail($id);
 
+        if ($pet->user_id != auth()->id()) {
+            abort(403);
+        }
+
         $racas = [
             'SRD - Sem Raça Definida',
             'Shih Tzu',
@@ -73,6 +77,10 @@ class PetController extends Controller
 
     public function update(Request $request, Pet $pet)
     {
+        if ($pet->user_id != auth()->id()) {
+            abort(403);
+        }
+
         $pet->update([
             'name' => $request->name,
             'species' => $request->species,
@@ -93,5 +101,17 @@ class PetController extends Controller
 
         return redirect()->route('pets.index')
             ->with('success', 'Pet excluído com sucesso!');
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        $petIds = $request->input('pet_ids', []);
+        
+        if (!empty($petIds)) {
+            Pet::whereIn('id', $petIds)->where('user_id', auth()->id())->delete();
+            return redirect()->route('pets.index')->with('success', count($petIds) . ' pet(s) excluído(s) com sucesso!');
+        }
+
+        return redirect()->route('pets.index')->with('error', 'Nenhum pet selecionado.');
     }
 }

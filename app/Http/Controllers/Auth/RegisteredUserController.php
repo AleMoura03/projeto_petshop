@@ -35,13 +35,22 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        $role = $request->input('role') === 'admin' ? 'admin' : 'cliente';
+        $is_approved = $role === 'admin' ? false : true;
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role' => $role,
+            'is_approved' => $is_approved,
         ]);
 
         event(new Registered($user));
+
+        if ($role === 'admin') {
+            return redirect()->route('login')->with('status', 'Status: Sua conta de AUdministrador foi solicitada e aguarda aprovação de nossos gestores!');
+        }
 
         Auth::login($user);
 

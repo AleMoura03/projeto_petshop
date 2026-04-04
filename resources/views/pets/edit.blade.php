@@ -1,70 +1,76 @@
-@php
-$racas = [
-    'SRD - Sem Raça Definida',
-    'Shih Tzu',
-    'Labrador',
-    'Golden Retriever',
-    'Bulldog',
-    'Poodle',
-    'Pastor Alemão',
-    'Rottweiler',
-    'Pinscher',
-    'Yorkshire'
-];
-@endphp
-
 <x-app-layout>
-    <div class="max-w-4xl mx-auto p-6">
+    <div class="max-w-4xl mx-auto p-6" x-data="{
+        species: '{{ $pet->species }}',
+        selectedBreed: '{{ $pet->breed }}',
+        selectedSize: '{{ $pet->porte }}',
+        dogBreeds: ['SRD - Sem Raça Definida', 'Shih Tzu', 'Labrador', 'Golden Retriever', 'Bulldog', 'Poodle', 'Pastor Alemão', 'Rottweiler', 'Pinscher', 'Yorkshire', 'PitBull'],
+        catBreeds: ['SRD - Sem Raça Definida', 'Siamês', 'Persa', 'Maine Coon', 'Angorá', 'Sphynx', 'Ragdoll', 'Ashera'],
+        dogSizes: [
+            {value: 'mini', label: 'Mini (até 4kg)'},
+            {value: 'pequeno', label: 'Pequeno (5-10kg)'},
+            {value: 'medio', label: 'Médio (11-25kg)'},
+            {value: 'grande', label: 'Grande (26-44kg)'},
+            {value: 'gigante', label: 'Gigante (45kg+)'}
+        ],
+        catSizes: [
+            {value: 'pequeno', label: 'Pequeno (até 4kg)'},
+            {value: 'medio', label: 'Médio (5-8kg)'},
+            {value: 'grande', label: 'Grande (9kg+)'}
+        ],
+        get currentBreeds() {
+            return this.species === 'gato' ? this.catBreeds : (this.species === 'cachorro' ? this.dogBreeds : []);
+        },
+        get currentSizes() {
+            return this.species === 'gato' ? this.catSizes : (this.species === 'cachorro' ? this.dogSizes : []);
+        }
+    }">
 
-        <h2>Editar Pet</h2>
+        <h2 class="text-2xl mb-6 font-poppins font-bold text-gray-800 dark:text-gray-200">Editar Pet</h2>
 
-        <form method="POST" action="{{ route('pets.update', $pet->id) }}">
-            @csrf
-            @method('PUT')
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-2xl p-8 border border-gray-100 dark:border-gray-700">
+            <form method="POST" action="{{ route('pets.update', $pet->id) }}" class="space-y-4">
+                @csrf
+                @method('PUT')
 
-            <input type="text" name="name" value="{{ $pet->name }}" required>
-        <label>Espécie</label>
-        <select name="species" required>
-            <option value="cachorro" {{ $pet->species == 'cachorro' ? 'selected' : '' }}>
-                Cachorro
-            </option>
-            <option value="gato" {{ $pet->species == 'gato' ? 'selected' : '' }}>
-                Gato
-            </option>
-        </select>
-        
-        <br><br>
+                <div>
+                    <label class="block text-gray-700 dark:text-gray-300 font-medium mb-1">Nome do Pet</label>
+                    <input type="text" name="name" value="{{ $pet->name }}" required class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-sky-500 focus:ring-sky-300 rounded-xl shadow-sm block w-full px-4 py-3">
+                </div>
 
-            <label>Raça:</label>
-            <select name="breed">
-                <option {{ $pet->breed == 'SRD' ? 'selected' : '' }}>SRD - Sem Raça Definida</option>
-                <option {{ $pet->breed == 'Shih Tzu' ? 'selected' : '' }}>Shih Tzu</option>
-                <option {{ $pet->breed == 'Labrador' ? 'selected' : '' }}>Labrador</option>
-                <option {{ $pet->breed == 'Golden Retriever' ? 'selected' : '' }}>Golden Retriever</option>
-                <option {{ $pet->breed == 'Bulldog' ? 'selected' : '' }}>Bulldog</option>
-                <option {{ $pet->breed == 'Pastor Alemao' ? 'selected' : '' }}>Pastor Alemão</option>
-                <option {{ $pet->breed == 'Poodle' ? 'selected' : '' }}>Poodle</option>
-                <option {{ $pet->breed == 'Rottweiler' ? 'selected' : '' }}>Rottweiler</option>
-                <option {{ $pet->breed == 'Pinscher' ? 'selected' : '' }}>Pinscher</option>
-                <option {{ $pet->breed == 'Yorkshire' ? 'selected' : '' }}>Yorkshire</option>
-                <option {{ $pet->breed == 'PitBull' ? 'selected' : '' }}>PitBull</option>
+                <div>
+                    <label class="block text-gray-700 dark:text-gray-300 font-medium mb-1">Espécie</label>
+                    <select name="species" x-model="species" x-on:change="selectedBreed = ''; selectedSize = '';" required class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-sky-500 focus:ring-sky-300 rounded-xl shadow-sm block w-full px-4 py-3">
+                        <option value="cachorro">Cachorro</option>
+                        <option value="gato">Gato</option>
+                    </select>
+                </div>
 
-            </select>
+                <div x-show="species !== ''" x-transition>
+                    <label class="block text-gray-700 dark:text-gray-300 font-medium mb-1">Raça</label>
+                    <select name="breed" x-model="selectedBreed" required class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-sky-500 focus:ring-sky-300 rounded-xl shadow-sm block w-full px-4 py-3">
+                        <option value="">Selecione</option>
+                        <template x-for="breed in currentBreeds" :key="breed">
+                            <option :value="breed" x-text="breed" :selected="breed === selectedBreed"></option>
+                        </template>
+                    </select>
+                </div>
 
-            <br><br>
+                <div x-show="species !== ''" x-transition>
+                    <label class="block text-gray-700 dark:text-gray-300 font-medium mb-1">Porte</label>
+                    <select name="porte" x-model="selectedSize" required class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-sky-500 focus:ring-sky-300 rounded-xl shadow-sm block w-full px-4 py-3">
+                        <option value="">Selecione</option>
+                        <template x-for="size in currentSizes" :key="size.value">
+                            <option :value="size.value" x-text="size.label" :selected="size.value === selectedSize"></option>
+                        </template>
+                    </select>
+                </div>
 
-            <label>Porte:</label>
-            <select name="porte">
-                <option value="mini" {{ $pet->porte == 'mini' ? 'selected' : '' }}>Mini (até 4kg)</option>
-                <option value="pequeno" {{ $pet->porte == 'pequeno' ? 'selected' : '' }}>Pequeno (5-10kg)</option>
-                <option value="medio" {{ $pet->porte == 'medio' ? 'selected' : '' }}>Médio (11-25kg)</option>
-                <option value="grande" {{ $pet->porte == 'grande' ? 'selected' : '' }}>Grande (26-44kg)</option>
-                <option value="gigante" {{ $pet->porte == 'gigante' ? 'selected' : '' }}>Gigante (45kg+)</option>
-            </select>
-
-            <button type="submit">Atualizar</button>
-
-        </form>
-
+                <div class="mt-8">
+                    <x-primary-button class="w-full justify-center py-4 text-base">
+                        🐾 Atualizar Pet
+                    </x-primary-button>
+                </div>
+            </form>
+        </div>
     </div>
 </x-app-layout>

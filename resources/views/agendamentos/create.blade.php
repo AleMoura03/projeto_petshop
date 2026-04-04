@@ -1,83 +1,149 @@
 <x-app-layout>
     <div class="max-w-4xl mx-auto p-6">
-        <h2 class="text-xl mb-4">Novo Agendamento</h2>
+        <h2 class="text-2xl mb-6 font-poppins font-bold text-gray-800 dark:text-gray-200">Novo Agendamento 🛁</h2>
 
         @if(session('success'))
-            <div class="bg-green-200 p-2 mb-3">
-                {{ session('success') }}
+            <div class="bg-green-100 border-l-4 border-green-500 p-4 mb-6 rounded-r-lg flex items-center shadow-sm">
+                <svg class="h-6 w-6 text-green-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span class="text-green-800 font-medium">{{ session('success') }}</span>
             </div>
         @endif
 
-        <form method="POST" action="{{ route('agendar.store') }}">
-            @csrf
-
-            <div class="mb-3">
-                <label>Escolha o pet</label>
-                <select name="pet_id" id="pet">
-                    @foreach($pets as $pet)
-                        <option value="{{ $pet->id }}" data-porte="{{ $pet->porte }}">
-                            {{ $pet->name }} ({{ $pet->porte }})
-                        </option>
-                    @endforeach
-                </select>
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-2xl border border-gray-100 dark:border-gray-700 flex flex-col lg:flex-row">
+            
+            <!-- Side Image -->
+            <div class="lg:w-2/5 relative min-h-[250px] lg:min-h-auto flex items-center justify-center p-8 bg-sky-50">
+                <img src="/images/bath_pets_1775261919954.png" alt="Cachorro tomando banho" class="w-full h-[250px] lg:h-full object-cover rounded-2xl shadow-md z-10 relative">
+                <div class="absolute inset-0 bg-sky-100 opacity-50 z-0"></div>
             </div>
 
-            <div class="mb-3">
-                <label>Serviço:</label>
-                <select name="servico_id" id="servico">
-                    @foreach($servicos as $servico)
-                        <option value="{{ $servico->id }}" data-mini="{{ $servico->preco_mini }}"
-                            data-pequeno="{{ $servico->preco_pequeno }}" data-medio="{{ $servico->preco_medio }}"
-                            data-grande="{{ $servico->preco_grande }}" data-gigante="{{ $servico->preco_gigante }}">
+            <!-- Form -->
+            <form method="POST" action="{{ route('agendar.store') }}" class="space-y-4 p-8 lg:w-3/5">
+                @csrf
 
-                            {{ $servico->nome }}
-                        </option>
-                    @endforeach
-                </select>
-                <p><strong>Preço:</strong> <span id="preco">R$ 0,00</span></p>
+                <div>
+                    <label class="block text-gray-700 dark:text-gray-300 font-medium mb-1">Qual pet será atendido?</label>
+                    <select name="pet_id" id="pet" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-sky-500 focus:ring-sky-300 rounded-xl shadow-sm block w-full px-4 py-3" required>
+                        <option value="" selected disabled>Selecione seu pet</option>
+                        @foreach($pets as $pet)
+                            <option value="{{ $pet->id }}" data-porte="{{ strtolower(trim($pet->porte)) }}" data-species="{{ strtolower(trim($pet->species)) }}">
+                                {{ $pet->name }} ({{ ucfirst($pet->species) }} - {{ ucfirst($pet->porte) }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
-            </div>
+                <div>
+                    <label class="block text-gray-700 dark:text-gray-300 font-medium mb-1">Escolha o Serviço</label>
+                    <select name="servico_id" id="servico" class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-sky-500 focus:ring-sky-300 rounded-xl shadow-sm block w-full px-4 py-3" required>
+                        <option value="" selected disabled>Selecione um serviço</option>
+                        @foreach($servicos as $servico)
+                            <option value="{{ $servico->id }}" 
+                                data-especie="{{ $servico->especie ?? 'ambos' }}"
+                                data-mini="{{ $servico->preco_mini }}"
+                                data-pequeno="{{ $servico->preco_pequeno }}"
+                                data-medio="{{ $servico->preco_medio }}"
+                                data-grande="{{ $servico->preco_grande }}"
+                                data-gigante="{{ $servico->preco_gigante }}">
+                                {{ preg_replace('/ \(.*\)/', '', $servico->nome) }}
+                            </option>
+                        @endforeach
+                    </select>
+                    
+                    <div class="mt-4 p-5 bg-slate-50 dark:bg-gray-700 rounded-xl border border-slate-200 dark:border-gray-600 flex items-center justify-between">
+                        <span class="text-gray-600 dark:text-gray-300 font-medium">Preço Estimado</span>
+                        <span id="preco" class="bg-green-100 text-green-800 px-4 py-2 rounded-full font-bold text-lg dark:bg-green-900 dark:text-green-300 shadow-sm transition-all duration-200">
+                            R$ 0,00
+                        </span>
+                    </div>
+                </div>
 
-            <div class="mb-3">
-                <label>Data:</label>
-                <input type="date" name="data" required>
-            </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-700 dark:text-gray-300 font-medium mb-1">Data</label>
+                        <input type="date" name="data" required class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-sky-500 focus:ring-sky-300 rounded-xl shadow-sm block w-full px-4 py-3">
+                    </div>
 
-            <div class="mb-3">
-                <label>Hora:</label>
-                <input type="time" name="hora" required>
-            </div>
+                    <div>
+                        <label class="block text-gray-700 dark:text-gray-300 font-medium mb-1">Hora</label>
+                        <input type="time" name="hora" required class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-sky-500 focus:ring-sky-300 rounded-xl shadow-sm block w-full px-4 py-3">
+                    </div>
+                </div>
 
-            <button type="submit">
-                Agendar
-            </button>
+                <div class="mt-8">
+                    <x-primary-button class="w-full justify-center py-4 text-base">
+                        🗓️ Confirmar Agendamento
+                    </x-primary-button>
+                </div>
 
-        </form>
-
+            </form>
+        </div>
     </div>
 </x-app-layout>
 
 <script>
-    function calcularPreco() {
-        let pet = document.getElementById('pet');
+    function updateServices() {
+        let petSelect = document.getElementById('pet');
+        if(petSelect.options.length === 0) return;
+        
+        let selectedPet = petSelect.options[petSelect.selectedIndex];
+        let petSpecies = selectedPet.getAttribute('data-species');
+        let petSize = selectedPet.getAttribute('data-porte');
+        
+        let servicoSelect = document.getElementById('servico');
+        let firstValidIndex = -1;
+        
+        // Hide/Show services based on pet's species
+        Array.from(servicoSelect.options).forEach((opt, index) => {
+            let servicoEsp = opt.getAttribute('data-especie').toLowerCase();
+            let isCompatible = servicoEsp === 'ambos' || servicoEsp === petSpecies;
+            
+            if (isCompatible) {
+                opt.style.display = 'block';
+                opt.disabled = false;
+                if (firstValidIndex === -1) {
+                    firstValidIndex = index;
+                }
+            } else {
+                opt.style.display = 'none';
+                opt.disabled = true;
+                opt.selected = false;
+            }
+        });
+        
+        // Ensure a valid option is selected
+        if (servicoSelect.options[servicoSelect.selectedIndex] && servicoSelect.options[servicoSelect.selectedIndex].disabled) {
+            if (firstValidIndex !== -1) {
+                servicoSelect.selectedIndex = firstValidIndex;
+            }
+        }
+        
+        calcularPreco(petSize);
+    }
+
+    function calcularPreco(petSize) {
         let servico = document.getElementById('servico');
-
-        let porte = pet.options[pet.selectedIndex].getAttribute('data-porte');
-
-        let preco = servico.options[servico.selectedIndex]
-            .getAttribute('data-' + porte);
-
-        if (preco) {
-            document.getElementById('preco').innerText = 'R$ ' + parseFloat(preco).toFixed(2);
-        } else {
+        if (servico.selectedIndex === -1 || servico.options.length === 0) {
             document.getElementById('preco').innerText = 'R$ 0,00';
+            return;
+        }
+
+        let preco = servico.options[servico.selectedIndex].getAttribute('data-' + petSize);
+
+        if (preco && !isNaN(preco) && preco !== "") {
+            document.getElementById('preco').innerText = 'R$ ' + parseFloat(preco).toFixed(2).replace('.', ',');
+        } else {
+            document.getElementById('preco').innerText = 'A calcular (Indisponível)';
         }
     }
 
-    // dispara ao mudar
-    document.getElementById('pet').addEventListener('change', calcularPreco);
-    document.getElementById('servico').addEventListener('change', calcularPreco);
+    document.getElementById('pet').addEventListener('change', updateServices);
+    document.getElementById('servico').addEventListener('change', () => {
+        let petSelect = document.getElementById('pet');
+        let petSize = petSelect.options[petSelect.selectedIndex].getAttribute('data-porte');
+        calcularPreco(petSize);
+    });
 
-    // executa ao carregar
-    calcularPreco();
+    // Run on load
+    window.addEventListener('DOMContentLoaded', updateServices);
 </script>

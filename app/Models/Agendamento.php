@@ -11,7 +11,11 @@ class Agendamento extends Model
         'pet_id',
         'servico_id',
         'data',
-        'hora'
+        'hora',
+        'preco',
+        'status',
+        'cliente_excluiu',
+        'admin_excluiu'
     ];
     public function pet()
     {

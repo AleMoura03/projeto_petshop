@@ -8,6 +8,9 @@ class Servico extends Model
 {
     protected $fillable = [
         'nome',
+        'especie',
+        'preco',
+        'duracao',
         'preco_mini',
         'preco_pequeno',
         'preco_medio',

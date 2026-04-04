@@ -12,9 +12,29 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('client.dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
+                    @if(auth()->user()->role === 'admin')
+                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                            {{ __('Painel Admin') }}
+                        </x-nav-link>
+                    @else
+                        <x-nav-link :href="route('client.dashboard')" :active="request()->routeIs('client.dashboard')">
+                            {{ __('Painel Cliente') }}
+                        </x-nav-link>
+                        
+                        <!-- Menu interativo estilo dropdown pode ser feito com x-dropdown, mas para um menu de topbar links fixos cascata ficam ótimos e rápidos -->
+                        <x-nav-link :href="route('pets.create')" :active="request()->routeIs('pets.create')">
+                            {{ __('Cadastrar Pet') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('agendar')" :active="request()->routeIs('agendar')">
+                            {{ __('Agendar Serviço') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('pets.index')" :active="request()->routeIs('pets.index')">
+                            {{ __('Meus Pets') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('agendamentos.index')" :active="request()->routeIs('agendamentos.index')">
+                            {{ __('Meus Agendamentos') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -67,9 +87,27 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('client.dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
+            @if(auth()->user()->role === 'admin')
+                <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                    {{ __('Painel Admin') }}
+                </x-responsive-nav-link>
+            @else
+                <x-responsive-nav-link :href="route('client.dashboard')" :active="request()->routeIs('client.dashboard')">
+                    {{ __('Painel Cliente') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('pets.create')" :active="request()->routeIs('pets.create')">
+                    {{ __('Cadastrar Pet') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('agendar')" :active="request()->routeIs('agendar')">
+                    {{ __('Agendar Serviço') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('pets.index')" :active="request()->routeIs('pets.index')">
+                    {{ __('Meus Pets') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('agendamentos.index')" :active="request()->routeIs('agendamentos.index')">
+                    {{ __('Meus Agendamentos') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->

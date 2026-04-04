@@ -10,9 +10,16 @@ use App\Http\Controllers\AdminController;
 Route::middleware(['auth'])->group(function () {
 });
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'client'])->group(function () {
+    Route::delete('pets/bulk-destroy', [PetController::class, 'bulkDestroy'])->name('pets.bulk_destroy');
     Route::resource('pets', PetController::class);
 });
+
+Route::get('/admin/agendamentos', [AgendamentoController::class, 'adminIndex'])->name('admin.agendamentos');
+Route::post('/admin/agendamentos/{id}/aprovar', [AgendamentoController::class, 'aprovar'])->name('agendamentos.aprovar');
+Route::post('/admin/agendamentos/{id}/recusar', [AgendamentoController::class, 'recusar'])->name('agendamentos.recusar');
+Route::delete('/admin/agendamentos/bulk-destroy', [AgendamentoController::class, 'adminBulkDestroy'])->name('admin.agendamentos.bulk_destroy');
+Route::delete('/admin/agendamentos/{id}', [AgendamentoController::class, 'adminDestroy'])->name('admin.agendamentos.destroy');
 
 Route::get('/', function () {
     return view('welcome');
@@ -40,15 +47,19 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/agendar', [AgendamentoController::class, 'store'])
         ->name('agendar.store');
 
+    Route::post('/agendamentos/{agendamento}/cancelar', [AgendamentoController::class, 'cancelar'])
+        ->name('agendamentos.cancelar');
+
+    Route::delete('/agendamentos/bulk-destroy', [AgendamentoController::class, 'bulkDestroy'])
+        ->name('agendamentos.bulk_destroy');
+
     Route::delete('/agendamentos/{agendamento}', [AgendamentoController::class, 'destroy'])
         ->name('agendamentos.destroy');
 
-    Route::get('/admin/dashboard', function (){
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
+
 
     Route::get('/client/dashboard', function () {
-        return view('client.dashboard');
+        return view('dashboard');
     })->name('client.dashboard');
 });
 
@@ -58,9 +69,9 @@ Route::get('/dashboard', function () {
 });
 
 Route::middleware(['auth','admin'])->prefix('admin')->group(function () {
-
     Route::get('/dashboard', [AdminController::class,'dashboard'])->name('admin.dashboard');
-
+    Route::post('/users/{id}/approve', [AdminController::class, 'approveAdmin'])->name('admin.users.approve');
+    Route::delete('/users/{id}/reject', [AdminController::class, 'rejectAdmin'])->name('admin.users.reject');
 });
 
 Route::middleware(['auth'])->group(function () {
