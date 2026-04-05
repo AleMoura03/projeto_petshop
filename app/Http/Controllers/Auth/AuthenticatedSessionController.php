@@ -41,6 +41,17 @@ class AuthenticatedSessionController extends Controller
             ]);
         }
 
+        // Validate if the tab used matches the actual user role
+        if ($request->has('role_tab') && $user->role !== $request->role_tab) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            
+            throw ValidationException::withMessages([
+                'email' => trans('A conta informada não corresponde ao tipo de acesso selecionado (Cliente/AUdministrador).'),
+            ]);
+        }
+
         if ($user->role == 'admin') {
             return redirect()->route('admin.dashboard');
         }

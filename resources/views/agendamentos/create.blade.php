@@ -82,68 +82,84 @@
 </x-app-layout>
 
 <script>
-    function updateServices() {
-        let petSelect = document.getElementById('pet');
-        if(petSelect.options.length === 0) return;
+    document.addEventListener('DOMContentLoaded', function() {
+        const petSelect = document.getElementById('pet');
+        const servicoSelect = document.getElementById('servico');
+        const precoDisplay = document.getElementById('preco');
         
-        let selectedPet = petSelect.options[petSelect.selectedIndex];
-        let petSpecies = selectedPet.getAttribute('data-species');
-        let petSize = selectedPet.getAttribute('data-porte');
-        
-        let servicoSelect = document.getElementById('servico');
-        let firstValidIndex = -1;
-        
-        // Hide/Show services based on pet's species
-        Array.from(servicoSelect.options).forEach((opt, index) => {
-            let servicoEsp = opt.getAttribute('data-especie').toLowerCase();
-            let isCompatible = servicoEsp === 'ambos' || servicoEsp === petSpecies;
-            
-            if (isCompatible) {
-                opt.style.display = 'block';
-                opt.disabled = false;
-                if (firstValidIndex === -1) {
-                    firstValidIndex = index;
+        // Armazenamos as opções originais para poder recriar as opções compatíveis
+        const originalOptions = Array.from(servicoSelect.options).map(opt => ({
+            value: opt.value,
+            text: opt.text,
+            especie: opt.getAttribute('data-especie') || '',
+            mini: opt.getAttribute('data-mini'),
+            pequeno: opt.getAttribute('data-pequeno'),
+            medio: opt.getAttribute('data-medio'),
+            grande: opt.getAttribute('data-grande'),
+            gigante: opt.getAttribute('data-gigante')
+        }));
+
+        function updateServices() {
+            if (petSelect.selectedIndex <= 0) {
+                // Se nenhum pet foi selecionado ainda
+                servicoSelect.innerHTML = '<option value="" selected disabled>Selecione um pet primeiro</option>';
+                precoDisplay.innerText = 'R$ 0,00';
+                return;
+            }
+
+            const selectedPet = petSelect.options[petSelect.selectedIndex];
+            const petSpecies = selectedPet.getAttribute('data-species').toLowerCase();
+            const petSize = selectedPet.getAttribute('data-porte').toLowerCase();
+
+            // Limpa as opções atuais
+            servicoSelect.innerHTML = '<option value="" selected disabled>Selecione um serviço</option>';
+
+            const addedNames = new Set();
+
+            originalOptions.forEach(opt => {
+                if (!opt.value) return; // ignora o placeholder original
+
+                const servicoEsp = opt.especie.toLowerCase();
+                
+                // Só adiciona se for de todos ('ambos') ou for da mesma espécie do pet
+                if (servicoEsp === 'ambos' || servicoEsp === petSpecies) {
+                    if (!addedNames.has(opt.text)) {
+                        addedNames.add(opt.text);
+                        const newOpt = document.createElement('option');
+                        newOpt.value = opt.value;
+                        newOpt.text = opt.text;
+                        newOpt.setAttribute('data-' + petSize, opt[petSize]); // Anexa apenas o preço deste porte
+                        servicoSelect.appendChild(newOpt);
+                    }
                 }
+            });
+
+            calcularPreco();
+        }
+
+        function calcularPreco() {
+            if (servicoSelect.selectedIndex <= 0) {
+                precoDisplay.innerText = 'R$ 0,00';
+                return;
+            }
+            
+            const selectedPet = petSelect.options[petSelect.selectedIndex];
+            const petSize = selectedPet.getAttribute('data-porte').toLowerCase();
+            const selectedOpt = servicoSelect.options[servicoSelect.selectedIndex];
+            
+            const preco = selectedOpt.getAttribute('data-' + petSize);
+
+            if (preco && !isNaN(preco) && preco !== "") {
+                precoDisplay.innerText = 'R$ ' + parseFloat(preco).toFixed(2).replace('.', ',');
             } else {
-                opt.style.display = 'none';
-                opt.disabled = true;
-                opt.selected = false;
-            }
-        });
-        
-        // Ensure a valid option is selected
-        if (servicoSelect.options[servicoSelect.selectedIndex] && servicoSelect.options[servicoSelect.selectedIndex].disabled) {
-            if (firstValidIndex !== -1) {
-                servicoSelect.selectedIndex = firstValidIndex;
+                precoDisplay.innerText = 'A calcular (Indisponível)';
             }
         }
-        
-        calcularPreco(petSize);
-    }
 
-    function calcularPreco(petSize) {
-        let servico = document.getElementById('servico');
-        if (servico.selectedIndex === -1 || servico.options.length === 0) {
-            document.getElementById('preco').innerText = 'R$ 0,00';
-            return;
-        }
+        petSelect.addEventListener('change', updateServices);
+        servicoSelect.addEventListener('change', calcularPreco);
 
-        let preco = servico.options[servico.selectedIndex].getAttribute('data-' + petSize);
-
-        if (preco && !isNaN(preco) && preco !== "") {
-            document.getElementById('preco').innerText = 'R$ ' + parseFloat(preco).toFixed(2).replace('.', ',');
-        } else {
-            document.getElementById('preco').innerText = 'A calcular (Indisponível)';
-        }
-    }
-
-    document.getElementById('pet').addEventListener('change', updateServices);
-    document.getElementById('servico').addEventListener('change', () => {
-        let petSelect = document.getElementById('pet');
-        let petSize = petSelect.options[petSelect.selectedIndex].getAttribute('data-porte');
-        calcularPreco(petSize);
+        // Roda a verificação de cara caso tenha old() values (como ao voltar do form)
+        updateServices();
     });
-
-    // Run on load
-    window.addEventListener('DOMContentLoaded', updateServices);
 </script>

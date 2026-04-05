@@ -26,7 +26,7 @@ Route::get('/', function () {
 });
 
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'client'])->group(function () {
 
     Route::get('/home', function () {
         return redirect()->route('client.dashboard');
@@ -66,10 +66,10 @@ Route::middleware(['auth'])->group(function () {
 
 Route::get('/dashboard', function () {
     return redirect()->route('client.dashboard');
-});
+})->name('dashboard');
 
-Route::middleware(['auth','admin'])->prefix('admin')->group(function () {
-    Route::get('/dashboard', [AdminController::class,'dashboard'])->name('admin.dashboard');
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::post('/users/{id}/approve', [AdminController::class, 'approveAdmin'])->name('admin.users.approve');
     Route::delete('/users/{id}/reject', [AdminController::class, 'rejectAdmin'])->name('admin.users.reject');
 });

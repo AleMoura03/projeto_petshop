@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>PetSpa e PetShop</title>
+    <title>FaPet Banho e Tosa</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,7 +20,7 @@
             <div class="max-w-7xl mx-auto px-6 sm:px-8 flex justify-between items-center">
                 <div class="flex items-center gap-2">
                     <span class="text-3xl">🐾</span>
-                    <h1 class="text-2xl font-poppins font-bold text-sky-500">Pet<span class="text-orange-500">Shop</span></h1>
+                    <h1 class="text-2xl font-poppins font-bold text-sky-500">Fa<span class="text-orange-500">Pet</span></h1>
                 </div>
 
                 <nav class="flex items-center gap-4">
@@ -83,7 +83,7 @@
         <!-- Fun Extra Feature Section -->
         <section class="bg-sky-500 w-full py-16 mt-8 rounded-t-[3rem]">
             <div class="max-w-7xl mx-auto px-6 sm:px-8 text-center">
-                <h3 class="font-poppins font-bold text-3xl text-white mb-8">Por que escolher o nosso PetShop?</h3>
+                <h3 class="font-poppins font-bold text-3xl text-white mb-8">Por que escolher a FaPet?</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div class="bg-white/10 backdrop-blur-sm p-6 rounded-3xl">
                         <div class="text-4xl mb-4">🛁</div>
@@ -105,7 +105,7 @@
         </section>
 
         <footer class="bg-slate-800 text-slate-400 py-6 text-center text-sm font-poppins">
-            <p>&copy; {{ date('Y') }} PetShop System. Todos os direitos reservados. 🐾</p>
+            <p>&copy; {{ date('Y') }} FaPet Banho e Tosa. Todos os direitos reservados. 🐾</p>
         </footer>
     </div>
 </body>

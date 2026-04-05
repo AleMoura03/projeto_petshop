@@ -1,18 +1,29 @@
 <x-app-layout>
     <div class="max-w-5xl mx-auto p-6">
 
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="font-poppins font-bold text-2xl text-slate-800 dark:text-gray-200 leading-tight">
-                Gestão de Agendamentos 🗂️
-            </h2>
-        </div>
+        <form action="{{ route('admin.agendamentos.bulk_destroy') }}" method="POST" id="bulk-delete-form">
+            @csrf
+            @method('DELETE')
 
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl rounded-2xl border border-gray-100 dark:border-gray-700">
-            <div class="p-0 overflow-x-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="font-poppins font-bold text-2xl text-slate-800 dark:text-gray-200 leading-tight">
+                    Gestão de Agendamentos 🗂️
+                </h2>
+                
+                @if(!$agendamentos->isEmpty())
+                <button type="submit" class="text-red-500 font-bold hover:text-red-700 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg transition-all text-sm" onclick="return confirm('Ocultar definitivamente todos os agendamentos selecionados?')">
+                    🗑️ Ocultar Selecionados
+                </button>
+                @endif
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl rounded-2xl border border-gray-100 dark:border-gray-700">
+                <div class="p-0 overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-200 text-sm font-semibold uppercase tracking-wider">
-                            <th class="px-6 py-4 border-b border-gray-200 dark:border-gray-600 rounded-tl-xl pl-8">Cliente</th>
+                            <th class="px-6 py-4 border-b border-gray-200 dark:border-gray-600 rounded-tl-xl w-10"></th>
+                            <th class="px-6 py-4 border-b border-gray-200 dark:border-gray-600 pl-4">Cliente</th>
                             <th class="px-6 py-4 border-b border-gray-200 dark:border-gray-600">Pet</th>
                             <th class="px-6 py-4 border-b border-gray-200 dark:border-gray-600">Serviço</th>
                             <th class="px-6 py-4 border-b border-gray-200 dark:border-gray-600">Data e Hora</th>
@@ -24,10 +35,13 @@
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                         @foreach($agendamentos as $agendamento)
                             <tr class="hover:bg-sky-50 dark:hover:bg-slate-700 transition-colors group">
-                                <td class="px-6 py-4 whitespace-nowrap pl-8">
+                                <td class="px-6 py-4 border-t border-gray-100 dark:border-gray-700">
+                                    <input type="checkbox" name="agendamento_ids[]" value="{{ $agendamento->id }}" class="w-5 h-5 text-red-500 bg-slate-100 border-slate-300 rounded focus:ring-red-500 focus:ring-2 cursor-pointer shadow-sm">
+                                </td>
+                                <td class="px-6 py-4 border-t border-gray-100 dark:border-gray-700 whitespace-nowrap pl-4">
                                     <div class="font-medium text-slate-800 dark:text-slate-200">{{ $agendamento->user->name ?? 'Usuário' }}</div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-gray-600 dark:text-gray-300">
+                                <td class="px-6 py-4 border-t border-gray-100 dark:border-gray-700 whitespace-nowrap text-gray-600 dark:text-gray-300">
                                     {{ $agendamento->pet->name ?? 'Sem pet' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-gray-600 dark:text-gray-300">
@@ -92,6 +106,7 @@
                 @endif
             </div>
         </div>
+        </form>
 
     </div>
 </x-app-layout>
