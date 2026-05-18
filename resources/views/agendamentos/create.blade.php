@@ -61,12 +61,21 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-gray-700 dark:text-gray-300 font-medium mb-1">Data</label>
-                        <input type="date" name="data" required class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-sky-500 focus:ring-sky-300 rounded-xl shadow-sm block w-full px-4 py-3">
+                        <input type="date" name="data" min="{{ date('Y-m-d') }}" required class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-sky-500 focus:ring-sky-300 rounded-xl shadow-sm block w-full px-4 py-3">
                     </div>
 
                     <div>
                         <label class="block text-gray-700 dark:text-gray-300 font-medium mb-1">Hora</label>
                         <input type="time" name="hora" required class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-sky-500 focus:ring-sky-300 rounded-xl shadow-sm block w-full px-4 py-3">
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <p class="text-xs text-sky-600 dark:text-sky-400 font-semibold bg-sky-50 dark:bg-sky-950/30 p-2.5 rounded-lg border border-sky-100 dark:border-sky-900/50">
+                            🕒 <strong>Horário de Funcionamento Comercial:</strong><br>
+                            • Segunda a Sexta: 08:00 às 18:00<br>
+                            • Sábados: 08:00 às 12:00<br>
+                            • Domingos: Fechados
+                        </p>
                     </div>
                 </div>
 
@@ -158,6 +167,55 @@
 
         petSelect.addEventListener('change', updateServices);
         servicoSelect.addEventListener('change', calcularPreco);
+ 
+        // Validação front-end de Horário Comercial
+        const form = document.querySelector('form');
+        const dataInput = document.querySelector('input[name="data"]');
+        const horaInput = document.querySelector('input[name="hora"]');
+
+        function validarHorario() {
+            const dataVal = dataInput.value;
+            const horaVal = horaInput.value;
+
+            if (!dataVal || !horaVal) return true;
+
+            // Criar data local correta
+            const date = new Date(dataVal + 'T00:00:00');
+            const day = date.getDay(); // 0 (Domingo) - 6 (Sábado)
+            
+            const [hours, minutes] = horaVal.split(':').map(Number);
+            const timeNum = hours * 60 + minutes;
+
+            if (day === 0) {
+                alert('O petshop está fechado aos domingos! Por favor, selecione outro dia.');
+                dataInput.value = '';
+                return false;
+            }
+
+            if (day === 6) { // Sábado
+                if (timeNum < 8 * 60 || timeNum > 12 * 60) {
+                    alert('Horário comercial de Sábado é das 08:00 às 12:00. Por favor, escolha outro horário.');
+                    horaInput.value = '';
+                    return false;
+                }
+            } else { // Segunda a Sexta
+                if (timeNum < 8 * 60 || timeNum > 18 * 60) {
+                    alert('Horário comercial de Segunda a Sexta é das 08:00 às 18:00. Por favor, escolha outro horário.');
+                    horaInput.value = '';
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        dataInput.addEventListener('change', validarHorario);
+        horaInput.addEventListener('change', validarHorario);
+
+        form.addEventListener('submit', function(e) {
+            if (!validarHorario()) {
+                e.preventDefault();
+            }
+        });
 
         // Roda a verificação de cara caso tenha old() values (como ao voltar do form)
         updateServices();

@@ -64,5 +64,56 @@ class DatabaseSeeder extends Seeder
             'preco_grande' => 130.00,
             'duracao' => 120
         ]);
+
+        \App\Models\Servico::create([
+            'nome' => 'Vacina V10 (Nobivac/MSD) - Cães',
+            'especie' => 'cachorro',
+            'preco_mini' => 120.00,
+            'preco_pequeno' => 120.00,
+            'preco_medio' => 120.00,
+            'preco_grande' => 120.00,
+            'preco_gigante' => 120.00,
+            'duracao' => 30
+        ]);
+
+        \App\Models\Servico::create([
+            'nome' => 'Vacina V10 (Vanguard/Zoetis) - Cães',
+            'especie' => 'cachorro',
+            'preco_mini' => 110.00,
+            'preco_pequeno' => 110.00,
+            'preco_medio' => 110.00,
+            'preco_grande' => 110.00,
+            'preco_gigante' => 110.00,
+            'duracao' => 30
+        ]);
+
+        \App\Models\Servico::create([
+            'nome' => 'Vacina Antirrábica (Defensor/Zoetis) - Cães',
+            'especie' => 'cachorro',
+            'preco_mini' => 80.00,
+            'preco_pequeno' => 80.00,
+            'preco_medio' => 80.00,
+            'preco_grande' => 80.00,
+            'preco_gigante' => 80.00,
+            'duracao' => 30
+        ]);
+
+        \App\Models\Servico::create([
+            'nome' => 'Vacina Antirrábica (Defensor/Zoetis) - Gatos',
+            'especie' => 'gato',
+            'preco_pequeno' => 80.00,
+            'preco_medio' => 80.00,
+            'preco_grande' => 80.00,
+            'duracao' => 30
+        ]);
+
+        \App\Models\Servico::create([
+            'nome' => 'Vacina V4 Felina (Felocell/Zoetis) - Gatos',
+            'especie' => 'gato',
+            'preco_pequeno' => 100.00,
+            'preco_medio' => 100.00,
+            'preco_grande' => 100.00,
+            'duracao' => 30
+        ]);
     }
 }

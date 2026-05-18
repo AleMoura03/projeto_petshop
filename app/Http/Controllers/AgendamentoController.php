@@ -18,18 +18,113 @@ class AgendamentoController extends Controller
         return view('agendamentos.create', compact('pets', 'servicos'));
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $agendamentos = Agendamento::where('user_id', Auth::id())
-            ->where('cliente_excluiu', false)
-            ->with('pet', 'servico')
-            ->get();
+        $query = Agendamento::where('user_id', Auth::id())
+            ->with('pet', 'servico');
 
-        return view('agendamentos.index', compact('agendamentos'));
+        if ($request->filled('pet_id')) {
+            $query->where('pet_id', $request->pet_id);
+        }
+
+        if ($request->filled('servico_id')) {
+            $query->where('servico_id', $request->servico_id);
+        }
+
+        $agendamentos = $query->orderBy('data', 'desc')->get();
+        
+        $pets = Pet::where('user_id', Auth::id())->get();
+        
+        $servicos = Servico::orderBy('nome')->get()->map(function($s) {
+            $s->nome_limpo = trim(preg_replace('/ \(.*\)/', '', $s->nome));
+            return $s;
+        })->unique(function ($item) {
+            return $item->nome_limpo . '-' . $item->especie;
+        });
+
+        return view('agendamentos.index', compact('agendamentos', 'pets', 'servicos'));
+    }
+
+    public function relatorioGastos(Request $request)
+    {
+        $query = Agendamento::where('user_id', Auth::id())
+            ->with('pet', 'servico');
+
+        // Se o usuário submeteu filtros de pesquisa, aplicamos com base na validação obrigatória
+        if ($request->anyFilled(['data_inicio', 'data_fim', 'especie', 'servico_nome'])) {
+            $request->validate([
+                'data_inicio'  => 'required|date',
+                'data_fim'     => 'required|date|after_or_equal:data_inicio',
+                'especie'      => 'required|string|in:cachorro,gato,todos',
+                'servico_nome' => 'required|string',
+            ]);
+
+            $query->whereDate('data', '>=', $request->data_inicio)
+                  ->whereDate('data', '<=', $request->data_fim);
+
+            // Filtragem pelo nome base/limpo do serviço (agrupamento da vacina etc) se não for 'todos'
+            if ($request->servico_nome !== 'todos') {
+                $nomeLimpo = $request->servico_nome;
+                $servicoIds = Servico::all()->filter(function($s) use ($nomeLimpo) {
+                    return trim(preg_replace('/ \(.*\)/', '', $s->nome)) === $nomeLimpo;
+                })->pluck('id');
+                $query->whereIn('servico_id', $servicoIds);
+            }
+
+            // Filtragem pela espécie do animal se não for 'todos'
+            if ($request->especie !== 'todos') {
+                $query->whereHas('pet', function($q) use ($request) {
+                    $q->where('species', $request->especie);
+                });
+            }
+        }
+
+        $agendamentos = $query->orderBy('data', 'desc')->get();
+        
+        // Faturamento total gasto do cliente (apenas aprovados e efetuados!)
+        $totalGasto = $agendamentos->whereIn('status', ['aprovado', 'efetuado'])->sum('preco');
+
+        $pets = Pet::where('user_id', Auth::id())->get();
+
+        // Mapeia todos os serviços limpos sem as marcas dos fabricantes para desduplicação no select
+        // Agrupamos também por espécie para que banhos de cães e gatos apareçam individualmente!
+        $servicos = Servico::orderBy('nome')->get()->map(function($s) {
+            $s->nome_limpo = trim(preg_replace('/ \(.*\)/', '', $s->nome));
+            return $s;
+        })->unique(function ($item) {
+            return $item->nome_limpo . '-' . $item->especie;
+        });
+
+        return view('agendamentos.relatorios', compact('agendamentos', 'totalGasto', 'pets', 'servicos'));
     }
 
     public function store(Request $request)
     {
+        $request->validate([
+            'pet_id' => 'required|exists:pets,id',
+            'servico_id' => 'required|exists:servicos,id',
+            'data' => 'required|date|after_or_equal:today',
+            'hora' => 'required'
+        ]);
+
+        // Validação de Horário Comercial
+        $dayOfWeek = date('N', strtotime($request->data)); // 1 (Segunda) a 7 (Domingo)
+        $horaFormatted = date('H:i', strtotime($request->hora));
+
+        if ($dayOfWeek == 7) {
+            return back()->withInput()->with('error', 'O petshop está fechado aos domingos! Por favor, selecione outro dia.');
+        }
+
+        if ($dayOfWeek == 6) { // Sábado
+            if ($horaFormatted < '08:00' || $horaFormatted > '12:00') {
+                return back()->withInput()->with('error', 'Aos sábados, o petshop funciona das 08:00 às 12:00. Escolha outro horário.');
+            }
+        } else { // Segunda a Sexta
+            if ($horaFormatted < '08:00' || $horaFormatted > '18:00') {
+                return back()->withInput()->with('error', 'De segunda a sexta, o petshop funciona das 08:00 às 18:00. Escolha outro horário.');
+            }
+        }
+
         $pet = Pet::find($request->pet_id);
         $servico = Servico::find($request->servico_id);
 
@@ -54,7 +149,7 @@ class AgendamentoController extends Controller
             'status' => 'pendente'
         ]);
 
-        return redirect()->route('agendar')->with('success', 'Agendamento realizado com sucesso!');
+        return redirect()->route('agendamentos.index')->with('success', 'Agendamento realizado com sucesso!');
     }
 
     public function edit($id)
@@ -77,6 +172,31 @@ class AgendamentoController extends Controller
 
     public function update(Request $request, $id)
     {
+        $request->validate([
+            'pet_id' => 'required|exists:pets,id',
+            'servico_id' => 'required|exists:servicos,id',
+            'data' => 'required|date|after_or_equal:today',
+            'hora' => 'required'
+        ]);
+
+        // Validação de Horário Comercial
+        $dayOfWeek = date('N', strtotime($request->data)); // 1 (Segunda) a 7 (Domingo)
+        $horaFormatted = date('H:i', strtotime($request->hora));
+
+        if ($dayOfWeek == 7) {
+            return back()->withInput()->with('error', 'O petshop está fechado aos domingos! Por favor, selecione outro dia.');
+        }
+
+        if ($dayOfWeek == 6) { // Sábado
+            if ($horaFormatted < '08:00' || $horaFormatted > '12:00') {
+                return back()->withInput()->with('error', 'Aos sábados, o petshop funciona das 08:00 às 12:00. Escolha outro horário.');
+            }
+        } else { // Segunda a Sexta
+            if ($horaFormatted < '08:00' || $horaFormatted > '18:00') {
+                return back()->withInput()->with('error', 'De segunda a sexta, o petshop funciona das 08:00 às 18:00. Escolha outro horário.');
+            }
+        }
+
         $agendamento = Agendamento::findOrFail($id);
 
         if ($agendamento->user_id != Auth::id()) {
@@ -118,29 +238,6 @@ class AgendamentoController extends Controller
         return redirect()->route('agendamentos.index');
     }
 
-    public function destroy(Agendamento $agendamento)
-    {
-        if ($agendamento->user_id != auth()->id()) {
-            abort(403);
-        }
-
-        $agendamento->cliente_excluiu = true;
-        $agendamento->save();
-
-        return redirect()->route('agendamentos.index')
-            ->with('success', 'Agendamento removido da sua lista!');
-    }
-
-    public function bulkDestroy(Request $request)
-    {
-        $ids = $request->input('agendamento_ids', []);
-        if (!empty($ids)) {
-            Agendamento::whereIn('id', $ids)->where('user_id', auth()->id())->update(['cliente_excluiu' => true]);
-            return redirect()->route('agendamentos.index')->with('success', count($ids) . ' serviço(s) ocultado(s) da tela.');
-        }
-        return redirect()->route('agendamentos.index')->with('error', 'Nenhum item selecionado.');
-    }
-
     public function cancelar($id)
     {
         $agendamento = Agendamento::findOrFail($id);
@@ -156,30 +253,9 @@ class AgendamentoController extends Controller
             ->with('success', 'Serviço cancelado com sucesso.');
     }
 
-    public function adminDestroy($id)
-    {
-        $agendamento = Agendamento::findOrFail($id);
-        
-        $agendamento->admin_excluiu = true;
-        $agendamento->save();
-
-        return back()->with('success', 'Agendamento removido da sua visualização!');
-    }
-
-    public function adminBulkDestroy(Request $request)
-    {
-        $ids = $request->input('agendamento_ids', []);
-        if (!empty($ids)) {
-            Agendamento::whereIn('id', $ids)->update(['admin_excluiu' => true]);
-            return back()->with('success', count($ids) . ' serviço(s) ocultado(s) do painel.');
-        }
-        return back()->with('error', 'Nenhum agendamento selecionado.');
-    }
-
     public function adminIndex()
     {
         $agendamentos = Agendamento::with('pet', 'servico', 'user')
-            ->where('admin_excluiu', false)    
             ->get();
 
         return view('admin.agendamentos.index', compact('agendamentos'));
@@ -203,5 +279,15 @@ class AgendamentoController extends Controller
         $agendamento->save();
 
         return back()->with('success', 'Agendamento recusado!');
+    }
+
+    public function efetuar($id)
+    {
+        $agendamento = Agendamento::findOrFail($id);
+
+        $agendamento->status = 'efetuado';
+        $agendamento->save();
+
+        return back()->with('success', 'Serviço marcado como concluído (efetuado)!');
     }
 }

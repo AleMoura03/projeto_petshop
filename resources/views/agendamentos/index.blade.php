@@ -26,24 +26,56 @@
             </div>
         </div>
 
-        @if($agendamentos->isEmpty())
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-8 text-center border border-gray-100 dark:border-gray-700">
-                <p class="text-gray-500 dark:text-gray-400 mb-4">Você ainda não possui nenhum agendamento.</p>
-                <a href="{{ route('agendar') }}" class="text-sky-600 hover:underline font-semibold">Fazer um agendamento agora</a>
-            </div>
-        @else
-            <form action="{{ route('agendamentos.bulk_destroy') }}" method="POST" id="bulk-delete-form">
-                @csrf
-                @method('DELETE')
-                
-                <div class="flex justify-between items-center mb-4 px-2">
-                    <p class="text-slate-500 font-medium">Selecione os itens que deseja excluir do seu painel:</p>
-                    <button type="submit" class="text-red-500 font-bold hover:text-red-700 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg transition-all text-sm" onclick="return confirm('Excluir todos itens selecionados da tela?')">
-                        🗑️ Excluir Selecionados
-                    </button>
+        <!-- Filtros Rápidos (Pet e Serviço) -->
+        <div class="bg-white dark:bg-gray-800 shadow-sm border border-sky-100 dark:border-gray-700 rounded-2xl p-4 mb-6">
+            <form method="GET" action="{{ route('agendamentos.index') }}" class="flex flex-col sm:flex-row gap-4 items-end">
+                <div class="w-full sm:w-1/3">
+                    <x-input-label for="pet_id" :value="__('Filtrar por Pet')" />
+                    <select id="pet_id" name="pet_id" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-sky-500 focus:ring-sky-500 rounded-md shadow-sm text-sm">
+                        <option value="">Todos os Pets</option>
+                        @foreach($pets as $pet)
+                            <option value="{{ $pet->id }}" {{ request('pet_id') == $pet->id ? 'selected' : '' }}>
+                                {{ $pet->name }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="w-full sm:w-1/3">
+                    <x-input-label for="servico_id" :value="__('Filtrar por Serviço')" />
+                    <select id="servico_id" name="servico_id" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-sky-500 focus:ring-sky-500 rounded-md shadow-sm text-sm">
+                        <option value="">Todos os Serviços</option>
+                        @foreach($servicos as $servico)
+                            <option value="{{ $servico->id }}" {{ request('servico_id') == $servico->id ? 'selected' : '' }}>
+                                {{ $servico->nome_limpo }} ({{ ucfirst($servico->especie) }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="w-full sm:w-1/3 flex gap-2 justify-end">
+                    <a href="{{ route('agendamentos.index') }}" class="px-4 py-2 bg-slate-200 dark:bg-gray-700 hover:bg-slate-300 dark:hover:bg-gray-600 text-slate-800 dark:text-slate-200 rounded-lg transition-colors font-bold text-sm w-full text-center">
+                        Limpar
+                    </a>
+                    <button type="submit" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-lg transition-colors font-bold text-sm w-full">
+                        Filtrar
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        @if($agendamentos->isEmpty())
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-8 text-center border border-gray-100 dark:border-gray-700">
+                @if(request()->filled('pet_id') || request()->filled('servico_id'))
+                    <p class="text-gray-500 dark:text-gray-400 mb-4">Nenhum agendamento encontrado para o filtro selecionado.</p>
+                    <a href="{{ route('agendamentos.index') }}" class="text-sky-600 hover:underline font-semibold">Limpar filtros</a>
+                @else
+                    <p class="text-gray-500 dark:text-gray-400 mb-4">Você ainda não possui nenhum agendamento.</p>
+                    <a href="{{ route('agendar') }}" class="text-sky-600 hover:underline font-semibold">Fazer um agendamento agora</a>
+                @endif
+            </div>
+        @else
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     @foreach($agendamentos as $agendamento)
                     @php
                         $statusLabel = $agendamento->status;
@@ -53,6 +85,7 @@
                         
                         $statusColor = match($statusLabel) {
                             'aprovado' => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+                            'efetuado' => 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
                             'pendente' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
                             'recusado', 'cancelado' => 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
                             default => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
@@ -60,13 +93,8 @@
                     @endphp
                     
                     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 p-6 flex flex-col justify-between hover:shadow-lg transition-shadow relative">
-                        <!-- Checkbox Bulk Delete -->
-                        <div class="absolute top-4 right-4 z-10">
-                            <input type="checkbox" name="agendamento_ids[]" value="{{ $agendamento->id }}" class="w-5 h-5 text-red-500 bg-slate-100 border-slate-300 rounded focus:ring-red-500 focus:ring-2 cursor-pointer shadow-sm">
-                        </div>
-
                         <div>
-                            <div class="flex items-center justify-between mb-4 w-[90%]">
+                            <div class="flex items-center justify-between mb-4 w-[100%]">
                                 <h3 class="text-xl font-poppins font-semibold text-slate-800 dark:text-slate-100">{{ $agendamento->servico->nome ?? 'Serviço removido' }}</h3>
                                 <span class="px-3 py-1 rounded-full text-xs font-semibold capitalize {{ $statusColor }}">
                                     {{ $statusLabel }}
@@ -102,17 +130,10 @@
                                     <button type="submit" class="text-yellow-600 hover:text-yellow-800 font-medium text-sm transition-colors" onclick="return confirm('Deseja realmente cancelar este serviço?')">Cancelar</button>
                                 </form>
                             @endif
-
-                            <form action="{{ route('agendamentos.destroy', $agendamento->id) }}" method="POST" class="inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-red-500 hover:text-red-700 font-medium text-sm transition-colors" onclick="return confirm('Isto vai apenas remover do seu painel e não cancela o agendamento! Tem certeza?')" title="Ocultar da Tela">Excluir</button>
-                            </form>
                         </div>
                     </div>
                 @endforeach
                 </div>
-            </form>
         @endif
     </div>
 </x-app-layout>

@@ -18,8 +18,7 @@ Route::middleware(['auth', 'client'])->group(function () {
 Route::get('/admin/agendamentos', [AgendamentoController::class, 'adminIndex'])->name('admin.agendamentos');
 Route::post('/admin/agendamentos/{id}/aprovar', [AgendamentoController::class, 'aprovar'])->name('agendamentos.aprovar');
 Route::post('/admin/agendamentos/{id}/recusar', [AgendamentoController::class, 'recusar'])->name('agendamentos.recusar');
-Route::delete('/admin/agendamentos/bulk-destroy', [AgendamentoController::class, 'adminBulkDestroy'])->name('admin.agendamentos.bulk_destroy');
-Route::delete('/admin/agendamentos/{id}', [AgendamentoController::class, 'adminDestroy'])->name('admin.agendamentos.destroy');
+Route::post('/admin/agendamentos/{id}/efetuar', [AgendamentoController::class, 'efetuar'])->name('agendamentos.efetuar');
 
 Route::get('/', function () {
     return view('welcome');
@@ -34,6 +33,9 @@ Route::middleware(['auth', 'client'])->group(function () {
 
     Route::get('/agendamentos', [AgendamentoController::class, 'index'])
         ->name('agendamentos.index');
+
+    Route::get('/relatorio-gastos', [AgendamentoController::class, 'relatorioGastos'])
+        ->name('cliente.relatorios');
 
     Route::get('/agendamentos/{agendamento}/edit', [AgendamentoController::class, 'edit'])
         ->name('agendamentos.edit');
@@ -50,12 +52,6 @@ Route::middleware(['auth', 'client'])->group(function () {
     Route::post('/agendamentos/{agendamento}/cancelar', [AgendamentoController::class, 'cancelar'])
         ->name('agendamentos.cancelar');
 
-    Route::delete('/agendamentos/bulk-destroy', [AgendamentoController::class, 'bulkDestroy'])
-        ->name('agendamentos.bulk_destroy');
-
-    Route::delete('/agendamentos/{agendamento}', [AgendamentoController::class, 'destroy'])
-        ->name('agendamentos.destroy');
-
 
 
     Route::get('/client/dashboard', function () {
@@ -70,8 +66,26 @@ Route::get('/dashboard', function () {
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/relatorios', [AdminController::class, 'relatorios'])->name('admin.relatorios');
+    
+    // Admin Users Management (Super Admin)
+    Route::get('/users/create', [AdminController::class, 'createAdmin'])->name('admin.users.create');
+    Route::post('/users/store', [AdminController::class, 'storeAdmin'])->name('admin.users.store');
+    
     Route::post('/users/{id}/approve', [AdminController::class, 'approveAdmin'])->name('admin.users.approve');
     Route::delete('/users/{id}/reject', [AdminController::class, 'rejectAdmin'])->name('admin.users.reject');
+    Route::delete('/users/{id}', [AdminController::class, 'destroyAdmin'])->name('admin.users.destroy');
+    
+    // Gerenciamento de Clientes
+    Route::get('/clientes', [AdminController::class, 'clientesIndex'])->name('admin.clientes.index');
+    Route::post('/clientes', [AdminController::class, 'storeCliente'])->name('admin.clientes.store');
+    Route::delete('/clientes/{id}', [AdminController::class, 'destroyCliente'])->name('admin.clientes.destroy');
+
+    // Admin criando dados para Clientes
+    Route::get('/clientes/{id}/pets/create', [AdminController::class, 'createPet'])->name('admin.clientes.pets.create');
+    Route::post('/clientes/{id}/pets', [AdminController::class, 'storePet'])->name('admin.clientes.pets.store');
+    Route::get('/clientes/{id}/agendamentos/create', [AdminController::class, 'createAgendamento'])->name('admin.clientes.agendamentos.create');
+    Route::post('/clientes/{id}/agendamentos', [AdminController::class, 'storeAgendamento'])->name('admin.clientes.agendamentos.store');
 });
 
 Route::middleware(['auth'])->group(function () {

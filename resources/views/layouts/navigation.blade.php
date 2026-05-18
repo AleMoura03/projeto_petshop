@@ -16,6 +16,14 @@
                         <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                             {{ __('Painel Admin') }}
                         </x-nav-link>
+                        @if(auth()->user()->is_super_admin)
+                            <x-nav-link :href="route('admin.relatorios')" :active="request()->routeIs('admin.relatorios')">
+                                {{ __('Relatórios') }}
+                            </x-nav-link>
+                        @endif
+                        <x-nav-link :href="route('admin.clientes.index')" :active="request()->routeIs('admin.clientes.index')">
+                            {{ __('Clientes') }}
+                        </x-nav-link>
                     @else
                         <x-nav-link :href="route('client.dashboard')" :active="request()->routeIs('client.dashboard')">
                             {{ __('Painel Cliente') }}
@@ -33,6 +41,9 @@
                         </x-nav-link>
                         <x-nav-link :href="route('agendamentos.index')" :active="request()->routeIs('agendamentos.index')">
                             {{ __('Meus Agendamentos') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('cliente.relatorios')" :active="request()->routeIs('cliente.relatorios')">
+                            {{ __('Relatório de Gastos') }}
                         </x-nav-link>
                     @endif
                 </div>
@@ -91,6 +102,14 @@
                 <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                     {{ __('Painel Admin') }}
                 </x-responsive-nav-link>
+                @if(auth()->user()->is_super_admin)
+                    <x-responsive-nav-link :href="route('admin.relatorios')" :active="request()->routeIs('admin.relatorios')">
+                        {{ __('Relatórios') }}
+                    </x-responsive-nav-link>
+                @endif
+                <x-responsive-nav-link :href="route('admin.clientes.index')" :active="request()->routeIs('admin.clientes.index')">
+                    {{ __('Clientes') }}
+                </x-responsive-nav-link>
             @else
                 <x-responsive-nav-link :href="route('client.dashboard')" :active="request()->routeIs('client.dashboard')">
                     {{ __('Painel Cliente') }}
@@ -106,6 +125,9 @@
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('agendamentos.index')" :active="request()->routeIs('agendamentos.index')">
                     {{ __('Meus Agendamentos') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('cliente.relatorios')" :active="request()->routeIs('cliente.relatorios')">
+                    {{ __('Relatório de Gastos') }}
                 </x-responsive-nav-link>
             @endif
         </div>
