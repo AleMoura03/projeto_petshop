@@ -31,7 +31,7 @@
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-xl rounded-2xl border border-sky-100 p-8">
                 
-                <form action="{{ route('admin.clientes.pets.store', $cliente->id) }}" method="POST" class="space-y-6">
+                <form action="{{ route('admin.clientes.pets.store', $cliente->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                     @csrf
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -72,6 +72,12 @@
                             </select>
                             <x-input-error class="mt-2" :messages="$errors->get('porte')" />
                         </div>
+                    </div>
+
+                    <div>
+                        <x-input-label for="foto" :value="__('Foto do Pet')" />
+                        <input id="foto" type="file" name="foto" accept="image/*" class="mt-1 block w-full border border-gray-300 focus:border-sky-500 focus:ring-sky-500 rounded-md shadow-sm text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100" />
+                        <x-input-error class="mt-2" :messages="$errors->get('foto')" />
                     </div>
 
                     <div class="flex items-center justify-end mt-6 gap-3">

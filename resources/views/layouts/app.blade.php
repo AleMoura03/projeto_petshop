@@ -37,5 +37,25 @@
                 {{ $slot }}
             </main>
         </div>
+
+        @if(session('whatsapp_url'))
+            <script>
+                window.open("{{ session('whatsapp_url') }}", '_blank');
+            </script>
+        @endif
+
+        @if(auth()->check() && !str_contains(request()->getPathInfo(), '/admin'))
+             <!-- Botão Flutuante do WhatsApp -->
+             <a href="https://api.whatsapp.com/send?phone=5538992379455&text=Olá!%20Gostaria%20de%20tirar%20uma%20dúvida%20sobre%20o%20petshop." 
+                target="_blank" 
+                class="fixed bottom-6 right-6 z-[9999] flex items-center justify-center w-16 h-16 text-white rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300"
+                style="background-color: #25D366; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3); width: 64px; height: 64px;"
+                title="Fale Conosco no WhatsApp">
+                 <!-- Modern SVG Chat Bubble representing WhatsApp -->
+                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: white; fill: white;">
+                     <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                 </svg>
+             </a>
+        @endif
     </body>
 </html>

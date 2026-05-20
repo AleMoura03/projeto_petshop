@@ -28,7 +28,7 @@
         <h2 class="text-2xl mb-6 font-poppins font-bold text-gray-800 dark:text-gray-200">Editar Pet</h2>
 
         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-2xl p-8 border border-gray-100 dark:border-gray-700">
-            <form method="POST" action="{{ route('pets.update', $pet->id) }}" class="space-y-4">
+            <form method="POST" action="{{ route('pets.update', $pet->id) }}" enctype="multipart/form-data" class="space-y-4">
                 @csrf
                 @method('PUT')
 
@@ -63,6 +63,16 @@
                             <option :value="size.value" x-text="size.label" :selected="size.value === selectedSize"></option>
                         </template>
                     </select>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    @if($pet->foto)
+                        <img src="{{ $pet->foto }}" alt="{{ $pet->name }}" class="w-16 h-16 object-cover rounded-xl border border-gray-200 shadow-sm">
+                    @endif
+                    <div class="flex-1">
+                        <label class="block text-gray-700 dark:text-gray-300 font-medium mb-1">Foto do Pet</label>
+                        <input type="file" name="foto" accept="image/*" class="border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-sky-500 focus:ring-sky-300 rounded-xl shadow-sm block w-full px-4 py-3 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100">
+                    </div>
                 </div>
 
                 <div class="mt-8">

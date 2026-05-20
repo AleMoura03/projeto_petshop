@@ -17,7 +17,7 @@
                     <h3 class="font-poppins font-bold text-lg flex items-center gap-2">➕ Cadastrar Novo Cliente</h3>
                 </div>
                 <div class="p-6">
-                    <form action="{{ route('admin.clientes.store') }}" method="POST" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                    <form action="{{ route('admin.clientes.store') }}" method="POST" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
                         @csrf
                         <div>
                             <x-input-label for="name" :value="__('Nome do Cliente')" />
@@ -30,6 +30,11 @@
                             <x-input-error :messages="$errors->get('email')" class="mt-2" />
                         </div>
                         <div>
+                            <x-input-label for="whatsapp" :value="__('WhatsApp')" />
+                            <x-text-input id="whatsapp" class="block mt-1 w-full" type="text" name="whatsapp" :value="old('whatsapp')" required placeholder="Ex: 38992379455" />
+                            <x-input-error :messages="$errors->get('whatsapp')" class="mt-2" />
+                        </div>
+                        <div>
                             <x-input-label for="password" :value="__('Senha')" />
                             <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required />
                             <x-input-error :messages="$errors->get('password')" class="mt-2" />
@@ -38,7 +43,7 @@
                             <x-input-label for="password_confirmation" :value="__('Confirmar Senha')" />
                             <x-text-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required />
                         </div>
-                        <div class="md:col-span-4 flex justify-end mt-2">
+                        <div class="md:col-span-5 flex justify-end mt-2">
                             <button type="submit" class="px-6 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl transition-colors font-bold shadow">
                                 Criar Conta de Cliente
                             </button>
@@ -58,6 +63,7 @@
                             <tr class="bg-slate-100 text-slate-600 text-sm font-semibold uppercase tracking-wider">
                                 <th class="px-6 py-4 border-b border-gray-200 pl-8">Nome</th>
                                 <th class="px-6 py-4 border-b border-gray-200">E-mail</th>
+                                <th class="px-6 py-4 border-b border-gray-200">WhatsApp</th>
                                 <th class="px-6 py-4 border-b border-gray-200 text-center">Pets Cadastrados</th>
                                 <th class="px-6 py-4 border-b border-gray-200 text-center">Data de Cadastro</th>
                                 <th class="px-6 py-4 border-b border-gray-200 text-center">Ações</th>
@@ -71,6 +77,9 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-gray-600">
                                         {{ $cliente->email }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-600">
+                                        {{ $cliente->whatsapp ?? 'Não cadastrado' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-center text-gray-600">
                                         <span class="bg-slate-200 px-3 py-1 rounded-full text-sm font-bold">{{ $cliente->pets_count }}</span>
@@ -98,7 +107,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="px-6 py-8 text-center text-gray-500">Nenhum cliente cadastrado no sistema.</td>
+                                    <td colspan="6" class="px-6 py-8 text-center text-gray-500">Nenhum cliente cadastrado no sistema.</td>
                                 </tr>
                             @endforelse
                         </tbody>

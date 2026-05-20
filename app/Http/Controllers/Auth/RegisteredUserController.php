@@ -29,13 +29,20 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
+        $role = $request->input('role') === 'admin' ? 'admin' : 'cliente';
+
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
+        ];
 
-        $role = $request->input('role') === 'admin' ? 'admin' : 'cliente';
+        if ($role === 'cliente') {
+            $rules['whatsapp'] = ['required', 'string', 'max:20'];
+        }
+
+        $request->validate($rules);
+
         $is_approved = $role === 'admin' ? false : true;
 
         $user = User::create([
@@ -44,6 +51,7 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
             'role' => $role,
             'is_approved' => $is_approved,
+            'whatsapp' => $role === 'cliente' ? $request->whatsapp : null,
         ]);
 
         event(new Registered($user));

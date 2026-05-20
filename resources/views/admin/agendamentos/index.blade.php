@@ -86,6 +86,19 @@
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                                                 </button>
                                             </form>
+                                        @elseif($agendamento->status == 'aprovado')
+                                            <form action="{{ route('agendamentos.efetuar', $agendamento->id) }}" method="POST" class="inline">
+                                                @csrf
+                                                <button type="submit" class="p-2 bg-blue-50 text-blue-600 hover:bg-blue-500 hover:text-white rounded-lg transition-colors border border-blue-200" title="Marcar como Efetuado/Concluído">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138z"></path></svg>
+                                                </button>
+                                            </form>
+                                            <form action="{{ route('agendamentos.lembrete', $agendamento->id) }}" method="POST" class="inline">
+                                                @csrf
+                                                <button type="submit" class="p-2 bg-green-50 text-green-600 hover:bg-green-500 hover:text-white rounded-lg transition-colors border border-green-200" title="Enviar Lembrete por WhatsApp">
+                                                    💬
+                                                </button>
+                                            </form>
                                         @endif
 
                                         <form action="{{ route('admin.agendamentos.destroy', $agendamento->id) }}" method="POST" class="inline">

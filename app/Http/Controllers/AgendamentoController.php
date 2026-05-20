@@ -102,7 +102,8 @@ class AgendamentoController extends Controller
     {
         $request->validate([
             'pet_id' => 'required|exists:pets,id',
-            'servico_id' => 'required|exists:servicos,id',
+            'servico_ids' => 'required|array|min:1',
+            'servico_ids.*' => 'exists:servicos,id',
             'data' => 'required|date|after_or_equal:today',
             'hora' => 'required'
         ]);
@@ -125,31 +126,35 @@ class AgendamentoController extends Controller
             }
         }
 
-        $pet = Pet::find($request->pet_id);
-        $servico = Servico::find($request->servico_id);
-
+        $pet = Pet::findOrFail($request->pet_id);
         $porte = strtolower(trim($pet->porte));
+        $createdCount = 0;
 
-        $preco = match ($porte) {
-            'mini' => $servico->preco_mini,
-            'pequeno' => $servico->preco_pequeno,
-            'medio' => $servico->preco_medio,
-            'grande' => $servico->preco_grande,
-            'gigante' => $servico->preco_gigante,
-            default => 0
-        };
+        foreach ($request->servico_ids as $servico_id) {
+            $servico = Servico::findOrFail($servico_id);
 
-        Agendamento::create([
-            'user_id' => Auth::id(),
-            'pet_id' => $request->pet_id,
-            'servico_id' => $request->servico_id,
-            'data' => $request->data,
-            'hora' => $request->hora,
-            'preco' => $preco,
-            'status' => 'pendente'
-        ]);
+            $preco = match ($porte) {
+                'mini' => $servico->preco_mini,
+                'pequeno' => $servico->preco_pequeno,
+                'medio' => $servico->preco_medio,
+                'grande' => $servico->preco_grande,
+                'gigante' => $servico->preco_gigante,
+                default => 0
+            };
 
-        return redirect()->route('agendamentos.index')->with('success', 'Agendamento realizado com sucesso!');
+            Agendamento::create([
+                'user_id' => Auth::id(),
+                'pet_id' => $request->pet_id,
+                'servico_id' => $servico_id,
+                'data' => $request->data,
+                'hora' => $request->hora,
+                'preco' => $preco,
+                'status' => 'pendente'
+            ]);
+            $createdCount++;
+        }
+
+        return redirect()->route('agendamentos.index')->with('success', "{$createdCount} agendamento(s) realizado(s) com sucesso!");
     }
 
     public function edit($id)
@@ -268,6 +273,12 @@ class AgendamentoController extends Controller
         $agendamento->status = 'aprovado';
         $agendamento->save();
 
+        $whatsappUrl = $this->getWhatsappUrl($agendamento, 'aprovado');
+
+        if ($whatsappUrl) {
+            return back()->with('success', 'Agendamento aprovado!')->with('whatsapp_url', $whatsappUrl);
+        }
+
         return back()->with('success', 'Agendamento aprovado!');
     }
 
@@ -277,6 +288,12 @@ class AgendamentoController extends Controller
 
         $agendamento->status = 'recusado';
         $agendamento->save();
+
+        $whatsappUrl = $this->getWhatsappUrl($agendamento, 'recusado');
+
+        if ($whatsappUrl) {
+            return back()->with('success', 'Agendamento recusado!')->with('whatsapp_url', $whatsappUrl);
+        }
 
         return back()->with('success', 'Agendamento recusado!');
     }
@@ -289,5 +306,52 @@ class AgendamentoController extends Controller
         $agendamento->save();
 
         return back()->with('success', 'Serviço marcado como concluído (efetuado)!');
+    }
+
+    public function enviarLembrete($id)
+    {
+        $agendamento = Agendamento::findOrFail($id);
+
+        $whatsappUrl = $this->getWhatsappUrl($agendamento, 'lembrete');
+
+        if ($whatsappUrl) {
+            return back()->with('success', 'Lembrete preparado!')->with('whatsapp_url', $whatsappUrl);
+        }
+
+        return back()->with('error', 'O cliente não possui WhatsApp cadastrado.');
+    }
+
+    private function getWhatsappUrl($agendamento, $tipo)
+    {
+        $user = $agendamento->user;
+        if (!$user || !$user->whatsapp) {
+            return null;
+        }
+
+        // Sanitizar número do telefone
+        $phone = preg_replace('/[^0-9]/', '', $user->whatsapp);
+        if (strpos($phone, '0') === 0) {
+            $phone = substr($phone, 1);
+        }
+        if (strlen($phone) <= 11) {
+            $phone = '55' . $phone;
+        }
+
+        $petName = $agendamento->pet->name ?? 'seu pet';
+        $servicoNome = $agendamento->servico->nome ?? 'serviço';
+        $dataFormatted = \Carbon\Carbon::parse($agendamento->data)->format('d/m/Y');
+        $hora = $agendamento->hora;
+
+        if ($tipo === 'aprovado') {
+            $text = "Olá, {$user->name}! Tudo bem? Passando para informar que o seu agendamento para o serviço de *{$servicoNome}* para o seu pet *{$petName}* no dia *{$dataFormatted}* às *{$hora}* foi *APROVADO* com sucesso! estamos preparando tudo para receber seu amiguinho com muito carinho. Caso precise alterar algo, por favor nos avise. Obrigado! 🐾";
+        } elseif ($tipo === 'recusado') {
+            $text = "Olá, {$user->name}! Esperamos que esteja bem. Gostaríamos de avisar que, devido a conflitos de horários em nossa agenda, o agendamento de *{$servicoNome}* para o seu pet *{$petName}* no dia *{$dataFormatted}* às *{$hora}* precisou ser *RECUSADO*. Poderia, por gentileza, entrar em contato conosco para escolhermos outro horário disponível? Agradecemos a compreensão! 🐾";
+        } elseif ($tipo === 'lembrete') {
+            $text = "Olá, {$user->name}! Tudo bem? Este é um lembrete amigável do agendamento de *{$servicoNome}* para o seu pet *{$petName}* que está confirmado para o dia *{$dataFormatted}* às *{$hora}*. Estamos ansiosos para recebê-los! Caso tenha algum imprevisto, nos avise com antecedência. Até breve! 🧼🐶🐱";
+        } else {
+            return null;
+        }
+
+        return "https://api.whatsapp.com/send?phone={$phone}&text=" . rawurlencode($text);
     }
 }

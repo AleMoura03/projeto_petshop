@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('servico_id')->contrained()->onDelete('cascade');
             $table->date('data');
             $table->time('hora');
+            $table->string('status')->default('pendente');
             $table->timestamps();
         });
     }

@@ -28,6 +28,13 @@
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
+        <!-- WhatsApp -->
+        <div class="mt-4" x-show="roleTab === 'cliente'" x-transition>
+            <x-input-label for="whatsapp" :value="__('WhatsApp / Telefone')" />
+            <x-text-input id="whatsapp" class="block mt-1 w-full" type="text" name="whatsapp" :value="old('whatsapp')" x-bind:required="roleTab === 'cliente'" placeholder="Ex: 38992379455" />
+            <x-input-error :messages="$errors->get('whatsapp')" class="mt-2" />
+        </div>
+
         <!-- Password -->
         <div class="mt-4">
             <x-input-label for="password" :value="__('Password')" />

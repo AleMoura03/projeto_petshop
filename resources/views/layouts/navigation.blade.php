@@ -33,6 +33,9 @@
                         <x-nav-link :href="route('pets.create')" :active="request()->routeIs('pets.create')">
                             {{ __('Cadastrar Pet') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')">
+                            {{ __('Meu Perfil') }}
+                        </x-nav-link>
                         <x-nav-link :href="route('agendar')" :active="request()->routeIs('agendar')">
                             {{ __('Agendar Serviço') }}
                         </x-nav-link>
@@ -66,7 +69,7 @@
 
                     <x-slot name="content">
                         <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
+                            {{ __('Meu Perfil') }}
                         </x-dropdown-link>
 
                         <!-- Authentication -->
@@ -141,7 +144,7 @@
 
             <div class="mt-3 space-y-1">
                 <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Profile') }}
+                    {{ __('Meu Perfil') }}
                 </x-responsive-nav-link>
 
                 <!-- Authentication -->

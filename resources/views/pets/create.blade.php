@@ -30,7 +30,7 @@
         </div>
 
         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-2xl p-8 border border-gray-100 dark:border-gray-700">
-            <form method="POST" action="{{ route('pets.store') }}" class="space-y-4">
+            <form method="POST" action="{{ route('pets.store') }}" enctype="multipart/form-data" class="space-y-4">
                 @csrf
 
                 <div>
@@ -47,7 +47,6 @@
                     </select>
                 </div>
 
-                <div x-show="species !== ''">
                 <div x-show="species !== ''" x-transition>
                     <label class="block text-gray-700 dark:text-gray-300 font-medium mb-1">Raça</label>
                     <select name="breed" required class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-sky-500 focus:ring-sky-300 rounded-xl shadow-sm block w-full px-4 py-3">
@@ -58,7 +57,6 @@
                     </select>
                 </div>
 
-                <div x-show="species !== ''">
                 <div x-show="species !== ''" x-transition>
                     <label class="block text-gray-700 dark:text-gray-300 font-medium mb-1">Porte</label>
                     <select name="porte" required class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-sky-500 focus:ring-sky-300 rounded-xl shadow-sm block w-full px-4 py-3">
@@ -67,6 +65,11 @@
                             <option :value="size.value" x-text="size.label"></option>
                         </template>
                     </select>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 dark:text-gray-300 font-medium mb-1">Foto do Pet</label>
+                    <input type="file" name="foto" accept="image/*" class="border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-sky-500 focus:ring-sky-300 rounded-xl shadow-sm block w-full px-4 py-3 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100">
                 </div>
 
                 <div class="mt-8">

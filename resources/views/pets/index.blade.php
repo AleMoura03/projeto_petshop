@@ -40,7 +40,18 @@
 
                         <div>
                             <div class="flex items-center justify-between mb-4 w-[90%]">
-                                <h3 class="text-xl font-poppins font-semibold text-slate-800 dark:text-slate-100">{{ $pet->name }}</h3>
+                                <div class="flex items-center gap-3">
+                                    @if($pet->foto)
+                                        <img src="{{ $pet->foto }}" alt="{{ $pet->name }}" class="w-12 h-12 object-cover rounded-xl shadow-sm border border-slate-100">
+                                    @else
+                                        <div class="w-12 h-12 bg-sky-50 dark:bg-sky-950/30 flex items-center justify-center rounded-xl text-2xl">
+                                            {{ $pet->species === 'gato' ? '🐱' : '🐶' }}
+                                        </div>
+                                    @endif
+                                    <div>
+                                        <h3 class="text-xl font-poppins font-semibold text-slate-800 dark:text-slate-100 leading-tight">{{ $pet->name }}</h3>
+                                    </div>
+                                </div>
                                 <span class="bg-sky-100 text-sky-800 text-xs font-semibold px-2.5 py-0.5 rounded-full dark:bg-sky-900 dark:text-sky-300">
                                     {{ ucfirst($pet->species) }}
                                 </span>

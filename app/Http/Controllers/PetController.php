@@ -34,12 +34,21 @@ class PetController extends Controller
 
     public function store(Request $request)
     {
+        $fotoPath = null;
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/pets'), $fileName);
+            $fotoPath = '/uploads/pets/' . $fileName;
+        }
+
         Pet::create([
             'user_id' => auth()->id(),
             'name' => $request->name,
             'species' => $request->species,
             'breed' => $request->breed,
-            'porte' => $request->porte
+            'porte' => $request->porte,
+            'foto' => $fotoPath
         ]);
 
         return redirect()->route('pets.index')
@@ -81,11 +90,23 @@ class PetController extends Controller
             abort(403);
         }
 
+        $fotoPath = $pet->foto;
+        if ($request->hasFile('foto')) {
+            if ($pet->foto && file_exists(public_path($pet->foto))) {
+                @unlink(public_path($pet->foto));
+            }
+            $file = $request->file('foto');
+            $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/pets'), $fileName);
+            $fotoPath = '/uploads/pets/' . $fileName;
+        }
+
         $pet->update([
             'name' => $request->name,
             'species' => $request->species,
             'breed' => $request->breed,
-            'porte' => $request->porte
+            'porte' => $request->porte,
+            'foto' => $fotoPath
         ]);
 
         return redirect()->route('pets.index');

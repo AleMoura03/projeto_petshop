@@ -158,6 +158,7 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'whatsapp' => 'required|string|max:20',
         ]);
 
         User::create([
@@ -165,7 +166,8 @@ class AdminController extends Controller
             'email' => $request->email,
             'password' => \Illuminate\Support\Facades\Hash::make($request->password),
             'role' => 'cliente',
-            // Clientes are automatically approved depending on system logic, but lets keep it standard
+            'whatsapp' => $request->whatsapp,
+            'is_approved' => true,
         ]);
 
         return back()->with('success', 'Conta de cliente criada com sucesso!');
@@ -211,12 +213,21 @@ class AdminController extends Controller
     {
         $cliente = User::findOrFail($id);
 
+        $fotoPath = null;
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/pets'), $fileName);
+            $fotoPath = '/uploads/pets/' . $fileName;
+        }
+
         Pet::create([
             'user_id' => $cliente->id,
             'name' => $request->name,
             'species' => $request->species,
             'breed' => $request->breed,
-            'porte' => $request->porte
+            'porte' => $request->porte,
+            'foto' => $fotoPath
         ]);
 
         return redirect()->route('admin.clientes.index')

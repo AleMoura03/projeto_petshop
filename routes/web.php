@@ -19,6 +19,7 @@ Route::get('/admin/agendamentos', [AgendamentoController::class, 'adminIndex'])-
 Route::post('/admin/agendamentos/{id}/aprovar', [AgendamentoController::class, 'aprovar'])->name('agendamentos.aprovar');
 Route::post('/admin/agendamentos/{id}/recusar', [AgendamentoController::class, 'recusar'])->name('agendamentos.recusar');
 Route::post('/admin/agendamentos/{id}/efetuar', [AgendamentoController::class, 'efetuar'])->name('agendamentos.efetuar');
+Route::post('/admin/agendamentos/{id}/lembrete', [AgendamentoController::class, 'enviarLembrete'])->name('agendamentos.lembrete');
 
 Route::get('/', function () {
     return view('welcome');

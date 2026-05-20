@@ -15,12 +15,26 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Seed default users
+        \App\Models\User::query()->delete();
 
-        // User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        \App\Models\User::create([
+            'name' => 'Administrador',
+            'email' => 'admin@fapet.com',
+            'password' => \Illuminate\Support\Facades\Hash::make('admin'),
+            'role' => 'admin',
+            'is_approved' => true,
+            'is_super_admin' => true,
+        ]);
+
+        \App\Models\User::create([
+            'name' => 'Cliente Teste',
+            'email' => 'cliente@fapet.com',
+            'password' => \Illuminate\Support\Facades\Hash::make('cliente'),
+            'role' => 'cliente',
+            'is_approved' => true,
+            'is_super_admin' => false,
+        ]);
 
         // Limpar serviços existentes para evitar duplicidade
         \App\Models\Servico::query()->delete();
@@ -28,6 +42,7 @@ class DatabaseSeeder extends Seeder
         \App\Models\Servico::create([
             'nome' => 'Banho (Cachorro)',
             'especie' => 'cachorro',
+            'preco' => 0.00,
             'preco_mini' => 40.00,
             'preco_pequeno' => 50.00,
             'preco_medio' => 65.00,
@@ -39,6 +54,7 @@ class DatabaseSeeder extends Seeder
         \App\Models\Servico::create([
             'nome' => 'Banho e Tosa (Cachorro)',
             'especie' => 'cachorro',
+            'preco' => 0.00,
             'preco_mini' => 65.00,
             'preco_pequeno' => 80.00,
             'preco_medio' => 100.00,
@@ -50,6 +66,7 @@ class DatabaseSeeder extends Seeder
         \App\Models\Servico::create([
             'nome' => 'Banho (Gato)',
             'especie' => 'gato',
+            'preco' => 0.00,
             'preco_pequeno' => 60.00, // Preço balanceado: menor que o gigante canino
             'preco_medio' => 75.00,
             'preco_grande' => 90.00,
@@ -59,6 +76,7 @@ class DatabaseSeeder extends Seeder
         \App\Models\Servico::create([
             'nome' => 'Banho e Tosa (Gato)',
             'especie' => 'gato',
+            'preco' => 0.00,
             'preco_pequeno' => 90.00,
             'preco_medio' => 110.00,
             'preco_grande' => 130.00,
@@ -68,6 +86,7 @@ class DatabaseSeeder extends Seeder
         \App\Models\Servico::create([
             'nome' => 'Vacina V10 (Nobivac/MSD) - Cães',
             'especie' => 'cachorro',
+            'preco' => 0.00,
             'preco_mini' => 120.00,
             'preco_pequeno' => 120.00,
             'preco_medio' => 120.00,
@@ -79,6 +98,7 @@ class DatabaseSeeder extends Seeder
         \App\Models\Servico::create([
             'nome' => 'Vacina V10 (Vanguard/Zoetis) - Cães',
             'especie' => 'cachorro',
+            'preco' => 0.00,
             'preco_mini' => 110.00,
             'preco_pequeno' => 110.00,
             'preco_medio' => 110.00,
@@ -90,6 +110,7 @@ class DatabaseSeeder extends Seeder
         \App\Models\Servico::create([
             'nome' => 'Vacina Antirrábica (Defensor/Zoetis) - Cães',
             'especie' => 'cachorro',
+            'preco' => 0.00,
             'preco_mini' => 80.00,
             'preco_pequeno' => 80.00,
             'preco_medio' => 80.00,
@@ -101,6 +122,7 @@ class DatabaseSeeder extends Seeder
         \App\Models\Servico::create([
             'nome' => 'Vacina Antirrábica (Defensor/Zoetis) - Gatos',
             'especie' => 'gato',
+            'preco' => 0.00,
             'preco_pequeno' => 80.00,
             'preco_medio' => 80.00,
             'preco_grande' => 80.00,
@@ -110,6 +132,7 @@ class DatabaseSeeder extends Seeder
         \App\Models\Servico::create([
             'nome' => 'Vacina V4 Felina (Felocell/Zoetis) - Gatos',
             'especie' => 'gato',
+            'preco' => 0.00,
             'preco_pequeno' => 100.00,
             'preco_medio' => 100.00,
             'preco_grande' => 100.00,

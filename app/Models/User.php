@@ -25,6 +25,7 @@ class User extends Authenticatable
         'role',
         'is_approved',
         'is_super_admin',
+        'whatsapp',
     ];
 
     /**
