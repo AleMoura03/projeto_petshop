@@ -27,7 +27,70 @@ class AdminController extends Controller
                 ->get();
         }
 
-        return view('admin.dashboard', compact('agendamentos', 'pendingAdmins', 'allAdmins'));
+        // Formatando eventos para o FullCalendar
+        $calendarEvents = $agendamentos->map(function ($a) {
+            $petName = $a->pet->name ?? 'Sem Pet';
+            $servicoNome = $a->servico->nome ?? 'Sem Serviço';
+            $servicoNome = trim(preg_replace('/\(.*\)/', '', $servicoNome));
+            $clienteNome = explode(' ', $a->user->name ?? 'Removido')[0];
+            
+            $color = match ($a->status) {
+                'aprovado' => '#10B981', // Emerald 500
+                'efetuado' => '#3B82F6', // Blue 500
+                'pendente' => '#F59E0B', // Amber 500
+                default => '#EF4444'     // Red 500
+            };
+
+            return [
+                'title' => "{$clienteNome}: {$petName} ({$servicoNome})",
+                'start' => $a->data . 'T' . $a->hora,
+                'color' => $color,
+                'extendedProps' => [
+                    'status' => ucfirst($a->status),
+                    'preco' => number_format($a->preco, 2, ',', '.')
+                ]
+            ];
+        });
+
+        // Contagem de espécies para o Gráfico de Rosca
+        $speciesCounts = [
+            'cachorro' => 0,
+            'gato' => 0
+        ];
+        foreach ($agendamentos as $a) {
+            $species = strtolower($a->pet->species ?? '');
+            if (str_contains($species, 'gato')) {
+                $speciesCounts['gato']++;
+            } else {
+                $speciesCounts['cachorro']++;
+            }
+        }
+
+        // Faturamento recente agrupado por data (últimos 7 dias com lançamentos)
+        $faturamentoDatas = [];
+        $faturamentoValores = [];
+        $agendamentosFaturamento = $agendamentos->whereIn('status', ['aprovado', 'efetuado'])
+            ->groupBy('data')
+            ->map(function ($group) {
+                return $group->sum('preco');
+            })
+            ->sortKeys();
+
+        $last7Days = $agendamentosFaturamento->take(-7);
+        foreach ($last7Days as $date => $sum) {
+            $faturamentoDatas[] = \Carbon\Carbon::parse($date)->format('d/m');
+            $faturamentoValores[] = (float) $sum;
+        }
+
+        return view('admin.dashboard', compact(
+            'agendamentos', 
+            'pendingAdmins', 
+            'allAdmins',
+            'calendarEvents',
+            'speciesCounts',
+            'faturamentoDatas',
+            'faturamentoValores'
+        ));
     }
 
     public function approveAdmin($id)

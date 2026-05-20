@@ -87,18 +87,86 @@
                                                 </button>
                                             </form>
                                         @elseif($agendamento->status == 'aprovado')
-                                            <form action="{{ route('agendamentos.efetuar', $agendamento->id) }}" method="POST" class="inline">
-                                                @csrf
-                                                <button type="submit" class="p-2 bg-blue-50 text-blue-600 hover:bg-blue-500 hover:text-white rounded-lg transition-colors border border-blue-200" title="Marcar como Efetuado/Concluído">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138z"></path></svg>
-                                                </button>
-                                            </form>
+                                            <button type="button" onclick="document.getElementById('efetuar-modal-{{ $agendamento->id }}').showModal()" class="p-2 bg-blue-50 text-blue-600 hover:bg-blue-500 hover:text-white rounded-lg transition-colors border border-blue-200" title="Marcar como Concluído">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138z"></path></svg>
+                                            </button>
+
+                                            <!-- Modal para Finalizar Agendamento -->
+                                            <dialog id="efetuar-modal-{{ $agendamento->id }}" class="rounded-2xl p-6 shadow-2xl border border-slate-100 max-w-md w-full backdrop:bg-slate-900/50 text-left">
+                                                <div class="flex justify-between items-center mb-4">
+                                                    <h4 class="font-poppins font-bold text-lg text-slate-800">Concluir Agendamento</h4>
+                                                    <button type="button" onclick="document.getElementById('efetuar-modal-{{ $agendamento->id }}').close()" class="text-slate-400 hover:text-slate-600">✕</button>
+                                                </div>
+                                                <form action="{{ route('agendamentos.efetuar', $agendamento->id) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                                                    @csrf
+                                                    <p class="text-slate-600 text-sm">Você está marcando o serviço para <strong>{{ $agendamento->pet->name }}</strong> como concluído. Opcionalmente, adicione fotos de antes e depois:</p>
+                                                    
+                                                    <div>
+                                                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Foto Antes (Opcional)</label>
+                                                        <input type="file" name="foto_antes" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100">
+                                                    </div>
+
+                                                    <div>
+                                                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Foto Depois (Opcional)</label>
+                                                        <input type="file" name="foto_depois" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-green-50 file:text-green-700 hover:file:bg-green-100">
+                                                    </div>
+
+                                                    <div class="flex justify-end gap-2 pt-2">
+                                                        <button type="button" onclick="document.getElementById('efetuar-modal-{{ $agendamento->id }}').close()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-sm transition-colors">Cancelar</button>
+                                                        <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm shadow transition-colors">Concluir Serviço</button>
+                                                    </div>
+                                                </form>
+                                            </dialog>
+
                                             <form action="{{ route('agendamentos.lembrete', $agendamento->id) }}" method="POST" class="inline">
                                                 @csrf
                                                 <button type="submit" class="p-2 bg-green-50 text-green-600 hover:bg-green-500 hover:text-white rounded-lg transition-colors border border-green-200" title="Enviar Lembrete por WhatsApp">
                                                     💬
                                                 </button>
                                             </form>
+                                        @elseif($agendamento->status == 'efetuado')
+                                            <button type="button" onclick="document.getElementById('fotos-modal-{{ $agendamento->id }}').showModal()" class="p-2 bg-slate-50 text-slate-600 hover:bg-slate-200 rounded-lg transition-colors border border-slate-200" title="Ver/Atualizar Fotos">
+                                                📸
+                                            </button>
+
+                                            <!-- Modal para Ver/Editar Fotos -->
+                                            <dialog id="fotos-modal-{{ $agendamento->id }}" class="rounded-2xl p-6 shadow-2xl border border-slate-100 max-w-lg w-full backdrop:bg-slate-900/50 text-left">
+                                                <div class="flex justify-between items-center mb-4">
+                                                    <h4 class="font-poppins font-bold text-lg text-slate-800">Fotos de Antes & Depois</h4>
+                                                    <button type="button" onclick="document.getElementById('fotos-modal-{{ $agendamento->id }}').close()" class="text-slate-400 hover:text-slate-600">✕</button>
+                                                </div>
+                                                <form action="{{ route('agendamentos.efetuar', $agendamento->id) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                                                    @csrf
+                                                    
+                                                    <!-- Grid de visualização de fotos existentes -->
+                                                    <div class="grid grid-cols-2 gap-4">
+                                                        <div>
+                                                            <span class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Foto Antes</span>
+                                                            @if($agendamento->foto_antes)
+                                                                <img src="{{ $agendamento->foto_antes }}" alt="Antes" class="w-full h-32 object-cover rounded-xl border mb-2">
+                                                            @else
+                                                                <div class="w-full h-32 bg-slate-100 flex items-center justify-center text-slate-400 text-xs rounded-xl border border-dashed mb-2">Sem foto cadastrada</div>
+                                                            @endif
+                                                            <input type="file" name="foto_antes" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-sky-50 file:text-sky-700">
+                                                        </div>
+
+                                                        <div>
+                                                            <span class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Foto Depois</span>
+                                                            @if($agendamento->foto_depois)
+                                                                <img src="{{ $agendamento->foto_depois }}" alt="Depois" class="w-full h-32 object-cover rounded-xl border mb-2">
+                                                            @else
+                                                                <div class="w-full h-32 bg-slate-100 flex items-center justify-center text-slate-400 text-xs rounded-xl border border-dashed mb-2">Sem foto cadastrada</div>
+                                                            @endif
+                                                            <input type="file" name="foto_depois" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-green-50 file:text-green-700">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="flex justify-end gap-2 pt-4">
+                                                        <button type="button" onclick="document.getElementById('fotos-modal-{{ $agendamento->id }}').close()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-sm transition-colors">Fechar</button>
+                                                        <button type="submit" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-xl text-sm shadow transition-colors">Salvar Fotos</button>
+                                                    </div>
+                                                </form>
+                                            </dialog>
                                         @endif
 
                                         <form action="{{ route('admin.agendamentos.destroy', $agendamento->id) }}" method="POST" class="inline">

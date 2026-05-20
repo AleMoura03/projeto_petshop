@@ -112,6 +112,16 @@ class AgendamentoController extends Controller
         $dayOfWeek = date('N', strtotime($request->data)); // 1 (Segunda) a 7 (Domingo)
         $horaFormatted = date('H:i', strtotime($request->hora));
 
+        // Validação: Não permitir agendamentos para horários passados no mesmo dia
+        $dataAgendamento = \Carbon\Carbon::parse($request->data)->format('Y-m-d');
+        $dataHoje = \Carbon\Carbon::today()->format('Y-m-d');
+        if ($dataAgendamento === $dataHoje) {
+            $horaHoje = \Carbon\Carbon::now()->format('H:i');
+            if ($horaFormatted < $horaHoje) {
+                return back()->withInput()->with('error', 'Não é possível realizar agendamentos para um horário que já passou hoje!');
+            }
+        }
+
         if ($dayOfWeek == 7) {
             return back()->withInput()->with('error', 'O petshop está fechado aos domingos! Por favor, selecione outro dia.');
         }
@@ -187,6 +197,16 @@ class AgendamentoController extends Controller
         // Validação de Horário Comercial
         $dayOfWeek = date('N', strtotime($request->data)); // 1 (Segunda) a 7 (Domingo)
         $horaFormatted = date('H:i', strtotime($request->hora));
+
+        // Validação: Não permitir agendamentos para horários passados no mesmo dia
+        $dataAgendamento = \Carbon\Carbon::parse($request->data)->format('Y-m-d');
+        $dataHoje = \Carbon\Carbon::today()->format('Y-m-d');
+        if ($dataAgendamento === $dataHoje) {
+            $horaHoje = \Carbon\Carbon::now()->format('H:i');
+            if ($horaFormatted < $horaHoje) {
+                return back()->withInput()->with('error', 'Não é possível realizar agendamentos para um horário que já passou hoje!');
+            }
+        }
 
         if ($dayOfWeek == 7) {
             return back()->withInput()->with('error', 'O petshop está fechado aos domingos! Por favor, selecione outro dia.');
@@ -298,14 +318,29 @@ class AgendamentoController extends Controller
         return back()->with('success', 'Agendamento recusado!');
     }
 
-    public function efetuar($id)
+    public function efetuar(Request $request, $id)
     {
         $agendamento = Agendamento::findOrFail($id);
 
         $agendamento->status = 'efetuado';
+
+        if ($request->hasFile('foto_antes')) {
+            $file = $request->file('foto_antes');
+            $fileName = time() . '_antes_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/agendamentos'), $fileName);
+            $agendamento->foto_antes = '/uploads/agendamentos/' . $fileName;
+        }
+
+        if ($request->hasFile('foto_depois')) {
+            $file = $request->file('foto_depois');
+            $fileName = time() . '_depois_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/agendamentos'), $fileName);
+            $agendamento->foto_depois = '/uploads/agendamentos/' . $fileName;
+        }
+
         $agendamento->save();
 
-        return back()->with('success', 'Serviço marcado como concluído (efetuado)!');
+        return back()->with('success', 'Serviço marcado como concluído (efetuado) com sucesso!');
     }
 
     public function enviarLembrete($id)
@@ -348,10 +383,23 @@ class AgendamentoController extends Controller
             $text = "Olá, {$user->name}! Esperamos que esteja bem. Gostaríamos de avisar que, devido a conflitos de horários em nossa agenda, o agendamento de *{$servicoNome}* para o seu pet *{$petName}* no dia *{$dataFormatted}* às *{$hora}* precisou ser *RECUSADO*. Poderia, por gentileza, entrar em contato conosco para escolhermos outro horário disponível? Agradecemos a compreensão! 🐾";
         } elseif ($tipo === 'lembrete') {
             $text = "Olá, {$user->name}! Tudo bem? Este é um lembrete amigável do agendamento de *{$servicoNome}* para o seu pet *{$petName}* que está confirmado para o dia *{$dataFormatted}* às *{$hora}*. Estamos ansiosos para recebê-los! Caso tenha algum imprevisto, nos avise com antecedência. Até breve! 🧼🐶🐱";
+        } elseif ($tipo === 'vazio') {
+            return "https://api.whatsapp.com/send?phone={$phone}";
         } else {
             return null;
         }
 
         return "https://api.whatsapp.com/send?phone={$phone}&text=" . rawurlencode($text);
+    }
+    
+
+    public function enviarWhatsAppVazio($id)
+    {
+        $agendamento = Agendamento::findOrFail($id);
+        $whatsappUrl = $this->getWhatsappUrl($agendamento, 'vazio');
+        if ($whatsappUrl) {
+            return back()->with('success', 'WhatsApp vazio preparado!')->with('whatsapp_url', $whatsappUrl);
+        }
+        return back()->with('error', 'O cliente não possui WhatsApp cadastrado.');
     }
 }

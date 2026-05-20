@@ -12,6 +12,60 @@
             </div>
         </div>
 
+        <!-- Cartão Fidelidade -->
+        <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-sky-100 mb-12 relative overflow-hidden">
+            <div class="absolute right-0 top-0 w-32 h-32 bg-orange-500/5 rounded-full -mr-8 -mt-8"></div>
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <div>
+                    <h3 class="font-poppins font-bold text-2xl text-slate-800 flex items-center gap-2">
+                        ⭐ Cartão Fidelidade FaPet
+                    </h3>
+                    <p class="text-slate-500 text-sm">A cada 10 banhos concluídos, seu pet ganha um banho totalmente grátis! 🐕🧼</p>
+                </div>
+                <div class="bg-orange-500 text-white font-bold px-4 py-2 rounded-xl text-xs font-poppins shadow-sm">
+                    {{ $completedCount }} {{ $completedCount === 1 ? 'Banho Concluído' : 'Banhos Concluídos' }}
+                </div>
+            </div>
+
+            @php
+                $stamps = $completedCount % 10;
+                $hasFree = ($completedCount > 0 && $stamps === 0);
+                if ($hasFree) {
+                    $stamps = 10;
+                }
+            @endphp
+
+            @if($stamps === 10)
+                <div class="bg-green-50 border border-green-200 rounded-2xl p-4 mb-6 flex items-center gap-4 animate-pulse">
+                    <span class="text-3xl">🎉</span>
+                    <div>
+                        <h4 class="font-poppins font-bold text-green-800 text-lg">Parabéns! Seu cartão está completo!</h4>
+                        <p class="text-green-600 text-sm">O próximo banho do seu pet é gratuito. Entre em contato pelo WhatsApp para resgatar seu prêmio!</p>
+                    </div>
+                </div>
+            @endif
+
+            <div class="grid grid-cols-5 sm:grid-cols-10 gap-3 max-w-2xl">
+                @for ($i = 1; $i <= 10; $i++)
+                    <div class="aspect-square flex flex-col items-center justify-center rounded-2xl border-2 transition-all duration-300 {{ $i <= $stamps ? 'bg-orange-500 text-white border-orange-500 scale-105 shadow-md shadow-orange-500/20' : 'bg-slate-50 border-dashed border-slate-300 text-slate-400' }}">
+                        @if($i <= $stamps)
+                            @if($i === 10)
+                                <span class="text-2xl animate-bounce">🎁</span>
+                            @else
+                                <span class="text-xl">🐾</span>
+                            @endif
+                        @else
+                            @if($i === 10)
+                                <span class="text-lg opacity-40">🎁</span>
+                            @else
+                                <span class="text-xs font-bold font-poppins">{{ $i }}</span>
+                            @endif
+                        @endif
+                    </div>
+                @endfor
+            </div>
+        </div>
+
         <!-- Action Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 

@@ -81,9 +81,9 @@ echo =============================================================
 echo    [ATENCAO] NAO FECHE ESTA JANELA ENQUANTO ESTIVER USANDO!
 echo =============================================================
 echo.
-echo Pressione qualquer tecla para ENCERRAR o sistema e fechar o servidor...
-pause >nul
-goto FECHAR_SERVIDOR
+    echo Pressione qualquer tecla para ENCERRAR o sistema e fechar o servidor...
+    pause nul
+    goto MENU
 
 :INTERNET
 cls
@@ -111,26 +111,35 @@ echo [INFO] Iniciando o servidor local do Laravel em segundo plano...
 start "Servidor FaPet" /MIN php artisan serve --port=8000
 ping 127.0.0.1 -n 3 >nul
 
-echo [INFO] Criando o link publico...
-echo.
-echo =============================================================
-echo   INSTRUCOES DE ACESSO EXTERNO:
-echo =============================================================
-echo   1. O link publico sera gerado abaixo pelo Localtunnel.
-echo      Exemplo de link gerado: https://xxxx.loca.lt
-echo.
-echo   2. Ao acessar esse link no outro PC pela primeira vez, 
-echo      cole o IP publico abaixo quando o site solicitar:
-echo.
-echo   Seu IP publico para copiar e colar se solicitado:
-powershell -Command "(Invoke-WebRequest -uri 'https://api.ipify.org' -UseBasicParsing).Content" 2>nul
-echo =============================================================
-echo   Pressione Ctrl+C nesta janela para encerrar o tunel e o servidor.
-echo =============================================================
-echo.
-call npx localtunnel --port 8000
+echo [INFO] Abrindo o tunel publico em uma nova janela...
+start "Localtunnel FaPet" cmd /k "npx localtunnel --port 8000"
 
-goto FECHAR_SERVIDOR
+cls
+echo =============================================================
+echo    [OK] O sistema FaPet esta rodando com compartilhamento!
+echo =============================================================
+echo    - Endereco local: http://localhost:8000
+echo    - O link publico (URL externa) sera gerado na outra janela
+echo      aberta com o titulo "Localtunnel FaPet".
+echo.
+echo    - Ao acessar o link externo pela primeira vez, se o site pedir
+echo      o IP publico do computador para liberar o acesso, descubra-o
+echo      acessando https://api.ipify.org ou buscando "meu ip" no Google.
+echo =============================================================
+echo    - Credenciais de acesso:
+echo      * Administrador:
+echo          E-mail: admin@fapet.com
+echo          Senha: admin
+echo      * Cliente de Teste:
+echo          E-mail: cliente@fapet.com
+echo          Senha: cliente
+echo =============================================================
+echo    [ATENCAO] NAO FECHE ESTA JANELA ENQUANTO ESTIVER USANDO!
+echo =============================================================
+echo.
+echo Pressione qualquer tecla para ENCERRAR o sistema e fechar os servidores...
+pause >nul
+goto MENU
 
 :APENAS_FECHAR
 cls
@@ -141,6 +150,8 @@ echo [INFO] Encerrando o servidor local...
 for /f "tokens=5" %%a in ('netstat -aon ^| findstr :8000 ^| findstr LISTENING') do (
     taskkill /F /PID %%a >nul 2>&1
 )
+echo [INFO] Fechando a janela do Localtunnel...
+taskkill /F /FI "WINDOWTITLE eq Localtunnel FaPet" >nul 2>&1
 echo [INFO] Tudo limpo!
 ping 127.0.0.1 -n 2 >nul
 goto MENU

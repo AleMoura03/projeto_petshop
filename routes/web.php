@@ -19,6 +19,7 @@ Route::get('/admin/agendamentos', [AgendamentoController::class, 'adminIndex'])-
 Route::post('/admin/agendamentos/{id}/aprovar', [AgendamentoController::class, 'aprovar'])->name('agendamentos.aprovar');
 Route::post('/admin/agendamentos/{id}/recusar', [AgendamentoController::class, 'recusar'])->name('agendamentos.recusar');
 Route::post('/admin/agendamentos/{id}/efetuar', [AgendamentoController::class, 'efetuar'])->name('agendamentos.efetuar');
+Route::post('/admin/agendamentos/{id}/whatsapp/vazio', [AgendamentoController::class, 'enviarWhatsAppVazio'])->name('agendamentos.whatsappvazio');
 Route::post('/admin/agendamentos/{id}/lembrete', [AgendamentoController::class, 'enviarLembrete'])->name('agendamentos.lembrete');
 
 Route::get('/', function () {
@@ -56,7 +57,10 @@ Route::middleware(['auth', 'client'])->group(function () {
 
 
     Route::get('/client/dashboard', function () {
-        return view('dashboard');
+        $completedCount = \App\Models\Agendamento::where('user_id', auth()->id())
+            ->where('status', 'efetuado')
+            ->count();
+        return view('dashboard', compact('completedCount'));
     })->name('client.dashboard');
 });
 

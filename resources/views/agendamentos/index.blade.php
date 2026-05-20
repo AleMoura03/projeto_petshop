@@ -115,6 +115,26 @@
                                 <svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                 <span class="font-medium mr-1">Preço:</span> R$ {{ number_format($agendamento->preco ?? 0, 2, ',', '.') }}
                             </div>
+
+                            @if($agendamento->status === 'efetuado' && ($agendamento->foto_antes || $agendamento->foto_depois))
+                                <div class="mt-4 border-t border-slate-100 dark:border-gray-700 pt-4">
+                                    <h4 class="text-xs font-bold font-poppins text-slate-500 dark:text-gray-400 mb-2 uppercase tracking-wide">📸 Resultado do Banho e Tosa:</h4>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        @if($agendamento->foto_antes)
+                                            <div class="relative rounded-xl overflow-hidden border border-slate-100 shadow-sm">
+                                                <img src="{{ $agendamento->foto_antes }}" alt="Antes" class="w-full h-28 object-cover">
+                                                <span class="absolute bottom-2 left-2 bg-slate-900/70 text-white text-[10px] font-bold px-2 py-0.5 rounded-lg backdrop-blur-sm">Antes</span>
+                                            </div>
+                                        @endif
+                                        @if($agendamento->foto_depois)
+                                            <div class="relative rounded-xl overflow-hidden border border-slate-100 shadow-sm">
+                                                <img src="{{ $agendamento->foto_depois }}" alt="Depois" class="w-full h-28 object-cover">
+                                                <span class="absolute bottom-2 left-2 bg-green-950/70 text-white text-[10px] font-bold px-2 py-0.5 rounded-lg backdrop-blur-sm">Depois ✨</span>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
                         </div>
 
                         <div class="flex justify-end items-center border-t border-gray-100 dark:border-gray-700 pt-4 mt-2 gap-3">
