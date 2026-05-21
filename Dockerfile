@@ -6,9 +6,7 @@ RUN sed -ri -e "s!/var/www/html!${APACHE_DOCUMENT_ROOT}!g" /etc/apache2/sites-av
 RUN a2enmod rewrite
 
 # ----- 3️⃣ Instalar dependências do sistema -----
-RUN apt-get update && apt-get install -y \
-    libpng-dev libonig-dev libxml2-dev zip unzip git \
-    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd
+RUN apt-get update && apt-get install -y libpng-dev libonig-dev libxml2-dev zip unzip git && docker-php-ext-install pdo pdo_mysql pdo_sqlite mbstring exif pcntl bcmath gd
 
 # ----- 4️⃣ Diretório de trabalho -----
 WORKDIR /var/www/html
@@ -28,7 +26,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
 # ----- 8️⃣ Ajustar permissões -----
 RUN chown -R www-data:www-data storage bootstrap/cache public
 
-# ----- 9️⃣ Expor porta (Render usará $PORT) -----
+RUN touch database/database.sqlite && php artisan migrate --no-interaction --force && php artisan storage:link && php artisan config:cache && php artisan route:cache
 EXPOSE 80
 
 # ----- 🔟 Iniciar Apache -----
