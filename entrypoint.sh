@@ -28,8 +28,8 @@ php artisan storage:link || true
 
 
 # Ensure proper permissions for runtime directories and database
-chown -R www-data:www-data database storage bootstrap/cache
-chmod -R 775 database storage bootstrap/cache
+chown -R www-data:www-data database storage bootstrap/cache /data
+chmod -R 775 database storage bootstrap/cache /data
 
 
 # Start Apache
