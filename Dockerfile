@@ -24,7 +24,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # ----- 7️⃣ Instalar Node.js e compilar assets -----
 # Install Node.js (includes npm) via NodeSource
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs npm \
+    && apt-get install -y nodejs \
     && npm ci \
     && npm run build
 
