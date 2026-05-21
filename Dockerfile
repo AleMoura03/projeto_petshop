@@ -26,8 +26,10 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
 # ----- 8️⃣ Ajustar permissões -----
 RUN chown -R www-data:www-data storage bootstrap/cache public
 
-RUN touch database/database.sqlite && php artisan migrate --no-interaction --force && php artisan storage:link && php artisan config:cache && php artisan route:cache
+# ----- 9️⃣ Preparar runtime -----
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 EXPOSE 80
+# ----- 🔟 Iniciar Apache (handled by entrypoint) -----
 
-# ----- 🔟 Iniciar Apache -----
-CMD ["apache2-foreground"]
