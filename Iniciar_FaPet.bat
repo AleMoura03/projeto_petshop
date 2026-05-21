@@ -41,7 +41,7 @@ call :VERIFICAR_REQUISITOS
 if errorlevel 1 goto FIM
 
 echo [INFO] Iniciando o servidor local do Laravel...
-start "Servidor FaPet" /MIN php artisan serve --port=8000
+start "Servidor FaPet" /MIN php artisan serve --host=0.0.0.0 --port=8000
 
 echo [INFO] Aguardando o servidor iniciar...
 ping 127.0.0.1 -n 3 >nul
@@ -94,25 +94,31 @@ echo.
 call :VERIFICAR_REQUISITOS
 if errorlevel 1 goto FIM
 
-:: Verificar se o Node/NPM esta instalado
-where npm >nul 2>&1
-if errorlevel 1 (
-    color 0C
-    echo [ERRO] O Node.js/NPM nao foi encontrado no sistema.
-    echo O modo de compartilhamento precisa do Node.js instalado.
-    echo Por favor, instale o Node.js ou use a opcao 1 (Modo Local).
-    echo.
-    pause
-    color 0B
-    goto MENU
-)
+    where npm >nul 2>&1
+    if errorlevel 1 (
+        color 0C
+        echo [ERRO] O Node.js/NPM nao foi encontrado no sistema.
+        echo O modo de compartilhamento precisa do Node.js instalado.
+        echo Por favor, instale o Node.js ou use a opcao 1 (Modo Local).
+        echo.
+        pause
+        color 0B
+        goto MENU
+    )
+    :: Verify npx is available
+    where npx >nul 2>&1
+    if errorlevel 1 (
+        echo [ERRO] O npx nao foi encontrado. Instale o pacote npm que fornece npx.
+        pause
+        goto MENU
+    )
 
 echo [INFO] Iniciando o servidor local do Laravel em segundo plano...
 start "Servidor FaPet" /MIN php artisan serve --port=8000
 ping 127.0.0.1 -n 3 >nul
 
 echo [INFO] Abrindo o tunel publico em uma nova janela...
-start "Localtunnel FaPet" cmd /k "npx localtunnel --port 8000"
+    start "" "%~dp0run_tunnel.bat"
 
 cls
 echo =============================================================
@@ -151,7 +157,7 @@ for /f "tokens=5" %%a in ('netstat -aon ^| findstr :8000 ^| findstr LISTENING') 
     taskkill /F /PID %%a >nul 2>&1
 )
 echo [INFO] Fechando a janela do Localtunnel...
-taskkill /F /FI "WINDOWTITLE eq Localtunnel FaPet" >nul 2>&1
+    taskkill /F /FI "WINDOWTITLE eq Localtunnel FaPet" >nul 2>&1
 echo [INFO] Tudo limpo!
 ping 127.0.0.1 -n 2 >nul
 goto MENU
