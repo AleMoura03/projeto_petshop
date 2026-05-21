@@ -7,10 +7,13 @@ services:
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
-        value: false
+        value: true
+      - key: LOG_CHANNEL
+        value: stderr
       - key: APP_URL
         value: https://fapet.onrender.com
       - key: SESSION_DRIVER
         value: database
       - key: APP_KEY
         value: "base64:WlGA6UG3nQ7yoErq+egY9lymCANyOK1YujuWu8tFjLk="
+
