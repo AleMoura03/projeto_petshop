@@ -1,12 +1,8 @@
 # Use the official PHP image with Apache
 FROM php:8.2-apache
 
-# ----- 1️⃣ Definir DocumentRoot para a pasta public -----
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-# O entrypoint do php‑apache usa essa variável para atualizar 000-default.conf
 RUN sed -ri -e "s!/var/www/html!${APACHE_DOCUMENT_ROOT}!g" /etc/apache2/sites-available/000-default.conf
-
-# ----- 2️⃣ Habilitar rewrite (necessário para .htaccess) -----
 RUN a2enmod rewrite
 
 # ----- 3️⃣ Instalar dependências do sistema -----
