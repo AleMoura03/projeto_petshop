@@ -1,40 +1,39 @@
 # Use the official PHP image with Apache
 FROM php:8.2-apache
 
-# Install system dependencies and PHP extensions
-RUN apt-get update && apt-get install -y \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    zip unzip git && \
-    docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd
+# ----- 1️⃣ Definir DocumentRoot para a pasta public -----
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+# O entrypoint do php‑apache usa essa variável para atualizar 000-default.conf
+RUN sed -ri -e "s!/var/www/html!${APACHE_DOCUMENT_ROOT}!g" /etc/apache2/sites-available/000-default.conf
 
-# Enable Apache rewrite module (optional, for Laravel routing)
+# ----- 2️⃣ Habilitar rewrite (necessário para .htaccess) -----
 RUN a2enmod rewrite
 
-# Set working directory
+# ----- 3️⃣ Instalar dependências do sistema -----
+RUN apt-get update && apt-get install -y \
+    libpng-dev libonig-dev libxml2-dev zip unzip git \
+    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd
+
+# ----- 4️⃣ Diretório de trabalho -----
 WORKDIR /var/www/html
 
-# Copy application source
+# ----- 5️⃣ Copiar código da aplicação -----
 COPY . .
 
-# Install Composer globally
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# ----- 6️⃣ Instalar Composer e dependências PHP (sem dev) -----
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+    && composer install --no-dev --optimize-autoloader
 
-# Install PHP dependencies (no dev)
-RUN composer install --no-dev --optimize-autoloader
+# ----- 7️⃣ Instalar Node.js e compilar assets -----
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && npm ci && npm run build
 
-# Install Node.js (using NodeSource) and build assets
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
-    apt-get install -y nodejs && \
-    npm ci && \
-    npm run build
+# ----- 8️⃣ Ajustar permissões -----
+RUN chown -R www-data:www-data storage bootstrap/cache public
 
-# Ensure proper permissions for Laravel storage & cache
-RUN chown -R www-data:www-data storage bootstrap/cache
-
-# Expose port (Render will map $PORT)
+# ----- 9️⃣ Expor porta (Render usará $PORT) -----
 EXPOSE 80
 
-# Start Apache in foreground
+# ----- 🔟 Iniciar Apache -----
 CMD ["apache2-foreground"]
