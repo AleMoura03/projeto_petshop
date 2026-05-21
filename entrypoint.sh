@@ -16,6 +16,8 @@ php artisan storage:link || true
 
 # Ensure proper permissions for runtime directories and database
 chown -R www-data:www-data database storage bootstrap/cache
+chmod -R 775 database storage bootstrap/cache
+
 
 # Start Apache
 exec apache2-foreground
