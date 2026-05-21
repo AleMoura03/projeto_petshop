@@ -16,5 +16,11 @@ services:
         value: database
       - key: SESSION_SECURE_COOKIE
         value: true
-      - key: APP_KEY
-        value: "base64:WlGA6UG3nQ7yoErq+egY9lymCANyOK1YujuWu8tFjLk="
+      - key: DB_CONNECTION
+        value: sqlite
+      - key: DB_DATABASE
+        value: /data/database.sqlite
+
+disk:
+  path: /data
+  sizeGB: 1

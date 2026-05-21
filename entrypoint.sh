@@ -3,10 +3,14 @@ set -e
 
 # Ensure SQLite DB file exists
 if [ -f /data/database.sqlite ]; then
-  cp /data/database.sqlite database/database.sqlite
+  echo "Using existing persistent DB"
 else
-  touch database/database.sqlite
+  echo "Creating new persistent DB"
+  mkdir -p /data
+  touch /data/database.sqlite
 fi
+# Symlink to Laravel expected location
+ln -sf /data/database.sqlite database/database.sqlite
 
 # Run migrations
 php artisan migrate --force
