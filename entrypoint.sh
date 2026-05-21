@@ -2,12 +2,25 @@
 set -e
 
 # Ensure SQLite DB file exists
-if [ -f /data/database.sqlite ]; then
-  echo "Using existing persistent DB"
+if [ -f /data/database.sqlite ] && php -r "
+  try {
+    \$db = new PDO('sqlite:/data/database.sqlite');
+    \$stmt = \$db->query('SELECT COUNT(*) FROM users');
+    if (\$stmt !== false && \$stmt->fetchColumn() > 0) {
+      exit(0);
+    }
+  } catch (Exception \$e) {}
+  exit(1);
+"; then
+  echo "Using existing persistent DB (contains users)"
 else
-  echo "Creating new persistent DB"
+  echo "Persistent DB is empty, copying from repository"
   mkdir -p /data
-  touch /data/database.sqlite
+  if [ -f database/database.sqlite ]; then
+    cp database/database.sqlite /data/database.sqlite
+  else
+    touch /data/database.sqlite
+  fi
 fi
 # Symlink to Laravel expected location
 ln -sf /data/database.sqlite database/database.sqlite
