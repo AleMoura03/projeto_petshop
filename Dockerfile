@@ -2,6 +2,8 @@
 FROM php:8.2-apache
 
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+ENV DB_CONNECTION=sqlite
+ENV DB_DATABASE=/data/database.sqlite
 RUN sed -ri -e "s!/var/www/html!${APACHE_DOCUMENT_ROOT}!g" /etc/apache2/sites-available/000-default.conf
 RUN a2enmod rewrite
 
@@ -19,9 +21,13 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
     && composer install --no-dev --optimize-autoloader
 
 # ----- 7️⃣ Instalar Node.js e compilar assets -----
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs \
-    && npm ci && npm run build
+# Set application URL for production
+ENV APP_URL=https://fapet.onrender.com
+
+# Install Node.js and build assets
+RUN apt-get update && apt-get install -y nodejs \
+    && npm ci \
+    && npm run build
 
 # ----- 8️⃣ Ajustar permissões -----
 RUN chown -R www-data:www-data storage bootstrap/cache public
